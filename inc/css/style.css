@@ -1,0 +1,102 @@
+@font-face {
+  font-family: 'Bryant';
+  src: url("../fonts/bryant/Bryant-Bold_0.otf") format("opentype"), url("../fonts/bryant/bryant-bold_0-webfont.ttf") format("truetype"), url("../fonts/bryant/bryant-bold_0-webfont.woff") format("woff");
+}
+
+body {
+  background-color: #bdbdbd;
+  background-image: url("../../img/background.jpg");
+  background-position: center;
+  background-repeat: repeat-y;
+  background-size: cover;
+}
+
+
+h1 {
+  font-family: Bryant;
+  font-size: 50px;
+  margin-top: 30px;
+  text-align: center;
+  color: #fff;
+  text-shadow: 5px 5px #000;
+  line-height: 50px;
+  -webkit-text-stroke: 1.5px black;
+}
+
+.platno {
+  position: relative;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 30px;
+  width: 800px;
+  height: 450px;
+  background-color: #000;
+  border: 2px solid gray;
+}
+
+#canvas {
+  margin: 0;
+  width: 800px;
+  height: 450px;
+}
+
+.keyboard {
+  position: relative;
+  margin-left: auto;
+  margin-right: auto;
+  width: 800px;
+  margin-top: 30px;
+}
+.keyboard .tlacitko {
+  font-family: Bryant;
+  font-size: 15px;
+  text-align: center;
+  padding: 8px 12px;
+  text-transform: uppercase;
+  background: none;
+  color: #fff;
+  border: 2px solid gray;
+}
+.keyboard .tlacitko:hover {
+  background-color: #fff;
+  color: #000;
+  cursor: pointer;
+}
+#west {
+  position: absolute;
+  left: 0;
+  top: 40px;
+}
+#east {
+  position: absolute;
+  left: 86px;
+  top: 40px;
+}
+#south {
+  position: absolute;
+  left: 45px;
+  top: 80px;
+}
+#north {
+  position: absolute;
+  left: 45px;
+  top: 0;
+}
+#attack {
+  position: absolute;
+  padding: 8px 25px;
+  left: 200px;
+  top: 40px;
+}
+#inventory {
+  position: absolute;
+  padding: 8px 25px;
+  left: 390px;
+  top: 40px;
+}
+#map {
+  position: absolute;
+  padding: 8px 25px;
+  left: 620px;
+  top: 40px;
+}

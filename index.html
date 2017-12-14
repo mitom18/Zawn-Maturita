@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Zawn - The Game</title>
+    <link rel="shortcut icon" href="img/favicon.png" type="image/x-icon" />
+    <link rel="stylesheet" type="text/css" href="inc/css/style.css" />
+  </head>
+  <body>
+    <audio id="audio" src="inc/sound/IronMan3.mp3"></audio>
+
+    <h1>ZAWN</h1>
+    <div class="platno">
+      <canvas id="canvas" width="640" height="480"></canvas>
+    </div>
+    <div class="keyboard">
+      <button id="west" class="tlacitko" type="button" name="button">w</button>
+      <button id="east" class="tlacitko" type="button" name="button">e</button>
+      <button id="south" class="tlacitko" type="button" name="button">s</button>
+      <button id="north" class="tlacitko" type="button" name="button">n</button>
+
+      <button id="attack" class="tlacitko" type="button" name="button">útok</button>
+      <button id="inventory" class="tlacitko" type="button" name="button">inventář</button>
+      <button id="map" class="tlacitko" type="button" name="button">mapa</button>
+    </div>
+
+    <script type="text/javascript" src="inc/js/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript">
+      var sounds = {
+        88 : 'audio'
+      }
+      document.onkeydown = function(e) {
+        var audio = sounds[e.keyCode];
+        var hudba = document.getElementById(audio);
+        hudba.volume = 0.5;
+        if (audio) hudba.play();
+      }
+      document.onkeyup = function(e) {
+        var audio = sounds[e.keyCode];
+        if (audio) document.getElementById(audio).pause();
+      }
+    </script>
+  </body>
+</html>
