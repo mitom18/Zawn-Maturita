@@ -16,6 +16,7 @@ h1 {
   font-family: Bryant;
   font-size: 50px;
   margin-top: 30px;
+  text-transform: uppercase;
   text-align: center;
   color: #fff;
   text-shadow: 5px 5px #000;
@@ -28,13 +29,87 @@ h1 {
   margin-left: auto;
   margin-right: auto;
   margin-top: 30px;
+  text-align: center;
   width: 800px;
   height: 450px;
   background-color: #000;
   border: 2px solid gray;
 }
 
-#canvas {
+.platno .header {
+  position: relative;
+  top: -400px;
+  text-align: center;
+  text-transform: uppercase;
+  z-index: 10;
+  font-family: Bryant;
+  color: #fff;
+  font-size: 50px;
+  text-align: center;
+}
+
+.platno .text {
+  position: relative;
+  top: -350px;
+  text-align: center;
+  text-transform: uppercase;
+  z-index: 10;
+  font-family: Bryant;
+  color: #fff;
+  font-size: 20px;
+  text-align: center;
+}
+
+.platno #play {
+  position: relative;
+  top: -290px;
+  text-align: center;
+  text-transform: uppercase;
+  z-index: 10;
+}
+
+.platno #playername {
+  position: relative;
+  top: -360px;
+  text-align: center;
+  z-index: 10;
+  font-family: Bryant;
+  font-size: 15px;
+  text-align: center;
+  padding: 8px 12px;
+  background: none;
+  color: #fff;
+  border: 2px solid gray;
+}
+
+.platno #playagain {
+  display: none;
+  position: relative;
+  top: -190px;
+  text-align: center;
+  text-transform: uppercase;
+  z-index: 10;
+}
+
+.platno .tlacitko {
+  font-family: Bryant;
+  font-size: 15px;
+  text-align: center;
+  padding: 8px 12px;
+  text-transform: uppercase;
+  background: none;
+  color: #fff;
+  border: 2px solid gray;
+}
+
+.platno .tlacitko:hover {
+  background-color: #fff;
+  color: #000;
+  cursor: pointer;
+}
+
+.platno #canvas {
+  position: relative;
   margin: 0;
   width: 800px;
   height: 450px;
@@ -85,13 +160,19 @@ h1 {
 #attack {
   position: absolute;
   padding: 8px 25px;
-  left: 200px;
+  left: 166px;
+  top: 40px;
+}
+#flee {
+  position: absolute;
+  padding: 8px 25px;
+  left: 300px;
   top: 40px;
 }
 #inventory {
   position: absolute;
   padding: 8px 25px;
-  left: 390px;
+  left: 450px;
   top: 40px;
 }
 #map {
