@@ -16,3 +16,9 @@ class Ogre extends Enemy {
     super("Ogre", 30, 4, 7, new Key());
   }
 }
+
+class Spider extends Enemy {
+  constructor() {
+    super("Spider", 10, 1, 4, new Gold(5));
+  }
+}

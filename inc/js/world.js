@@ -53,7 +53,7 @@ function describeWorld(svet) {
 
 function drawMap(x, y, playerX, playerY, world) {
     Context.context.save();
-    Context.context.clearRect(x, y-30, world.length*10, world[0].length*13+30);
+    Context.context.clearRect(x, y-30, world.length*15, world[0].length*15+30);
     Context.context.fillText("Map:", x, y-15);
     var Xpuv = x;
     var Ypuv = y;
@@ -63,45 +63,45 @@ function drawMap(x, y, playerX, playerY, world) {
       item.forEach(function(item2, index2) {
         if (item2 === 0) {
             Context.context.fillStyle = 'pink';
-            Context.context.fillRect(xova, yova, 10, 13);
-            xova += 10;
+            Context.context.fillRect(xova, yova, 15, 15);
+            xova += 15;
         }
         else if (item2 === 1) {
             Context.context.fillStyle = 'yellow';
-            Context.context.fillRect(xova, yova, 10, 13);
-            xova += 10;
+            Context.context.fillRect(xova, yova, 15, 15);
+            xova += 15;
         }
         else if (item2 === 2) {
             Context.context.fillStyle = 'grey';
-            Context.context.fillRect(xova, yova, 10, 13);
-            xova += 10;
+            Context.context.fillRect(xova, yova, 15, 15);
+            xova += 15;
         }
         else if (item2 === 3) {
             Context.context.fillStyle = 'gold';
-            Context.context.fillRect(xova, yova, 10, 13);
-            xova += 10;
+            Context.context.fillRect(xova, yova, 15, 15);
+            xova += 15;
         }
         else if (item2 === 4) {
             Context.context.fillStyle = 'silver';
-            Context.context.fillRect(xova, yova, 10, 13);
-            xova += 10;
+            Context.context.fillRect(xova, yova, 15, 15);
+            xova += 15;
         }
         else if (item2 === 5) {
             Context.context.fillStyle = 'red';
-            Context.context.fillRect(xova, yova, 10, 13);
-            xova += 10;
+            Context.context.fillRect(xova, yova, 15, 15);
+            xova += 15;
         }
         else if (item2 === 6) {
             Context.context.fillStyle = 'black';
-            Context.context.fillRect(xova, yova, 10, 13);
-            xova += 10;
+            Context.context.fillRect(xova, yova, 15, 15);
+            xova += 15;
         }
       });
       xova = Xpuv;
-      yova += 13;
+      yova += 15;
     });
     Context.context.fillStyle = 'blue';
-    Context.context.fillRect(Xpuv+playerX*10, Ypuv+playerY*13, 10, 13);
+    Context.context.fillRect(Xpuv+playerX*15, Ypuv+playerY*15, 15, 15);
     Context.context.restore();
 }
 
@@ -127,9 +127,9 @@ class mapTile {
 class roomStart extends mapTile {
   intro_text() {
     this.image = document.getElementById("entrance");
-    this.text = "You find yourself if a room with flickering torches on the walls. You can make out two paths, each equally as dark and foreboding.";
-    Context.context.drawImage(this.image, 60, 50, 200, 220);
-    wrapText(Context.context, this.text, 10, 360, 320, 25);
+    this.text = "You find yourself in a room with flickering torches on the walls. You can make out two paths, each equally as dark and foreboding.";
+    Context.context.drawImage(this.image, 65, 25, 250, 250);
+    wrapText(Context.context, this.text, 15, 330, 400, 25);
   }
   modify_player(player) {
     player.inCombat = false;
@@ -152,8 +152,8 @@ class emptyPath extends mapTile {
   intro_text() {
     this.image = document.getElementById("path");
     this.text = "Another unremarkable part of the dungeon. You must forge onwards.";
-    Context.context.drawImage(this.image, 75, 80, 200, 220);
-    wrapText(Context.context, this.text, 10, 360, 320, 25);
+    Context.context.drawImage(this.image, 80, 50, 250, 250);
+    wrapText(Context.context, this.text, 15, 330, 400, 25);
   }
   modify_player(player) {
     player.inCombat = false;
@@ -175,8 +175,8 @@ class roomFinal {
       }
     };
     if (!this.klic) this.text = "You have to find a key to unlock the exit door.";
-    Context.context.drawImage(this.image, 60, 50, 200, 220);
-    wrapText(Context.context, this.text, 10, 360, 320, 25);
+    Context.context.drawImage(this.image, 75, 30, 250, 250);
+    wrapText(Context.context, this.text, 15, 330, 400, 25);
   }
   modify_player(player) {
     player.inCombat = false;
@@ -219,8 +219,8 @@ class roomLootGold extends roomLoot {
       this.image = document.getElementById("path");
       this.text = "Another unremarkable part of the dungeon. You must forge onwards.";
     }
-    Context.context.drawImage(this.image, 75, 80, 200, 220);
-    wrapText(Context.context, this.text, 10, 360, 320, 25);
+    Context.context.drawImage(this.image, 80, 50, 250, 250);
+    wrapText(Context.context, this.text, 15, 330, 400, 25);
   }
 }
 
@@ -236,8 +236,8 @@ class roomLootDagger extends roomLoot {
       this.image = document.getElementById("path");
       this.text = "Another unremarkable part of the dungeon. You must forge onwards.";
     }
-    Context.context.drawImage(this.image, 75, 80, 200, 220);
-    wrapText(Context.context, this.text, 10, 360, 320, 25);
+    Context.context.drawImage(this.image, 80, 50, 250, 250);
+    wrapText(Context.context, this.text, 15, 330, 400, 25);
   }
 }
 
@@ -259,11 +259,11 @@ class roomEnemy extends mapTile {
       var damage = Math.floor(Math.random() * (this.enemy.damagemax - this.enemy.damagemin + 1)) + this.enemy.damagemin;
       player.hp = player.hp - damage;
       if (player.isAlive()) {
-        player.printInventory(380, 330);
-        Context.context.clearRect(10, 400, 320, 320);
-        wrapText(Context.context, "{0} does {1} damage. You have {2} HP remaining.".format(this.enemy.name, damage, player.hp), 10, 420, 320, 25);
+        player.printInventory(480, 315);
+        Context.context.clearRect(15, 400, 320, 320);
+        wrapText(Context.context, "{0} does {1} damage. You have {2} HP remaining.".format(this.enemy.name, damage, player.hp), 15, 390, 400, 25);
       } else {
-        player.printInventory(380, 330);
+        player.printInventory(480, 315);
         Context.context.fillStyle = 'white';
         Context.context.globalAlpha = 0.2;
         Context.context.fillRect(0, 0, player.platno.width, player.platno.height);
@@ -298,7 +298,7 @@ class roomEnemyOgre extends roomEnemy {
       this.image = document.getElementById("enemydead");
       this.text = "The corpse of a dead ogre lies on the ground.";
     }
-    Context.context.drawImage(this.image, 75, 80, 200, 220);
-    wrapText(Context.context, this.text, 10, 360, 320, 25);
+    Context.context.drawImage(this.image, 80, 50, 250, 250);
+    wrapText(Context.context, this.text, 15, 330, 400, 25);
   }
 }

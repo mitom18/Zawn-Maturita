@@ -10,7 +10,7 @@
 
     <h1>ZAWN</h1>
     <div class="platno">
-      <canvas id="canvas" width="640px" height="480px"></canvas>
+      <canvas id="canvas" width="800px" height="450px"></canvas>
       <div class="header">zawn</div><br>
       <div class="text">zadejte jméno:</div><br>
       <input id="playername" type="text" name="playername" value=""><br>
@@ -148,7 +148,7 @@
       class Player {
         constructor(name) {
           this.name = name;
-          this.inventory = [new Key(), new Key(), new Key(), new Dagger(), new Dagger(), new Dagger(), new Dagger(), new Dagger(), new Dagger(), new Dagger(), new Dagger(), new Gold(20)];
+          this.inventory = [new Dagger(), new Dagger(), new Dagger(), new Dagger(), new Dagger(), new Dagger(), new Dagger(), new Dagger(), new Gold(20)];
           this.money = 0;
           this.hp = 100;
           this.locationX = startingPositionX;
@@ -175,12 +175,12 @@
               _this.inventory.splice(index, 1);
             }
           });
-          Context.context.clearRect(x, y-65, 115, 50);
-          Context.context.fillText("Name: {0}".format(this.name), x, y-50);
-          Context.context.drawImage(document.getElementById("life"), x, y-36, 20, 20);
-          Context.context.fillText(this.hp, x+25, y-20);
-          Context.context.drawImage(document.getElementById("coin"), x+65, y-36.5, 20, 20);
-          Context.context.fillText(this.money, x+90, y-20);
+          Context.context.clearRect(x, y-65, 130, 50);
+          Context.context.fillText("Name: {0}".format(this.name), x, y-45);
+          Context.context.drawImage(document.getElementById("life"), x, y-31, 20, 20);
+          Context.context.fillText(this.hp, x+25, y-15);
+          Context.context.drawImage(document.getElementById("coin"), x+70, y-31.5, 20, 20);
+          Context.context.fillText(this.money, x+95, y-15);
 
           //kresli hracuv inventar (ted uz bez penez)
           var polozka = 0;
@@ -198,17 +198,17 @@
               if (inv[polozka]) {
 
                 if (polozka != 0 && (inv[polozka].constructor.name === inv[polozka-1].constructor.name)) {
-                  if (counter == 1) xova -= 33;
+                  if (counter == 1) xova -= 38;
                   counter++;
-                  Context.context.clearRect(xova, yova, 30, 33);
-                  Context.context.drawImage(inv[polozka].image, xova, yova, 30, 33);
+                  Context.context.clearRect(xova, yova, 33, 33);
+                  Context.context.drawImage(inv[polozka].image, xova, yova, 33, 33);
                   Context.context.fillText(counter, xova+2, yova+31);
                   j--;
                 } else {
-                  if (counter > 1) xova += 33;
+                  if (counter > 1) xova += 38;
                   var counter = 1;
-                  Context.context.drawImage(inv[polozka].image, xova, yova, 30, 33);
-                  xova += 33;
+                  Context.context.drawImage(inv[polozka].image, xova, yova, 33, 33);
+                  xova += 38;
                 }
                 polozka++;
 
@@ -217,7 +217,7 @@
               }
             }
             xova = Xpuv;
-            yova += 36;
+            yova += 38;
           }
           Context.context.restore();
         }
@@ -240,7 +240,7 @@
 
           Context.context.save();
           this.platno = document.getElementById("canvas")
-          Context.context.clearRect(0, 0, this.platno.width/2+2, this.platno.height)
+          Context.context.clearRect(0, 0, this.platno.width/2+10, this.platno.height)
           Context.context.restore();
 
           this.aktualniMistnost = stepInTile(this.locationX, this.locationY, world);
@@ -248,8 +248,8 @@
           this.aktualniMistnost.modify_player(this);
 
           if (this.isAlive()) {
-            this.printInventory(380, 330);
-            drawMap(380, 90, this.locationX, this.locationY, _world);
+            this.printInventory(480, 315);
+            drawMap(480, 80, this.locationX, this.locationY, _world);
             if (this.victory) {
               Context.context.fillStyle = 'white';
               Context.context.globalAlpha = 0.2;
@@ -310,23 +310,23 @@
               }
             }
           });
-          Context.context.clearRect(10, 340, 320, 320);
-          wrapText(Context.context, "You use {0} against {1}!".format(best_weapon.name, this.enemy.name), 10, 360, 320, 25);
+          Context.context.clearRect(15, 315, 400, 400);
+          wrapText(Context.context, "You use {0} against {1}!".format(best_weapon.name, this.enemy.name), 15, 330, 400, 25);
           this.enemy.hp -= Math.floor(Math.random() * (best_weapon.damagemax - best_weapon.damagemin + 1)) + best_weapon.damagemin;
           if (!this.enemy.isAlive()) {
             this.inCombat = false;
             this.aktualniMistnost.addLoot(this);
-            this.printInventory(380, 330);
-            Context.context.clearRect(10, 370, 320, 320);
-            wrapText(Context.context, "You killed {0}!".format(this.enemy.name), 10, 390, 320, 25);
+            this.printInventory(480, 315);
+            Context.context.clearRect(15, 370, 400, 400);
+            wrapText(Context.context, "You killed {0}!".format(this.enemy.name), 15, 360, 400, 25);
             Context.context.clearRect(0, 0, this.platno.width/2+1, this.platno.height/2+1);
-            Context.context.drawImage(document.getElementById("enemydead"), 75, 80, 200, 220);
+            Context.context.drawImage(document.getElementById("enemydead"), 80, 50, 250, 250);
             document.getElementById("combathudba").pause();
             document.getElementById("combathudba").currentTime = 0;
             document.getElementById("pozadihudba").play();
           } else {
-            Context.context.clearRect(10, 370, 320, 320);
-            wrapText(Context.context, "{0} HP is {1}.".format(this.enemy.name, this.enemy.hp), 10, 390, 320, 25);
+            Context.context.clearRect(15, 370, 400, 400);
+            wrapText(Context.context, "{0} HP is {1}.".format(this.enemy.name, this.enemy.hp), 15, 360, 400, 25);
           }
         }
         flee(world) {
@@ -441,7 +441,7 @@
           }
 
           //defaultni nastaveni pro kresleni na canvas
-          Context.context.font = '14pt Bryant';
+          Context.context.font = '16pt Bryant';
           Context.context.fillStyle = 'white';
 
           //vstup do uvodni mistnosti
@@ -449,10 +449,10 @@
           aktualniMistnost.intro_text();
 
           //uvodni vykresleni mapy
-          drawMap(380, 90, player.locationX, player.locationY, _world);
+          drawMap(480, 80, player.locationX, player.locationY, _world);
 
           //uvodni vykresleni inventare
-          player.printInventory(380, 330);
+          player.printInventory(480, 315);
 
           //zacne hrat hudba na pozadi
           document.getElementById("pozadihudba").play();
