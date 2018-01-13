@@ -16,6 +16,13 @@ class Gold extends Item {
   }
 }
 
+class LifePotion extends Item {
+  constructor(amt) {
+    super("Potion", "A potion that restores {0} HP.".format(amt), amt);
+    this.image = document.getElementById("lifepotion");
+  }
+}
+
 class Key extends Item {
   constructor() {
     super("Key", "A key with skeleton head.", 100);

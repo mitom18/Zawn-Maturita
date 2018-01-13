@@ -12,10 +12,19 @@
     <div class="platno">
       <canvas id="canvas" width="800px" height="450px"></canvas>
       <div class="header">zawn</div><br>
-      <div class="text">zadejte jméno:</div><br>
+      <div class="text">enter your name:</div><br>
       <input id="playername" type="text" name="playername" value=""><br>
       <button id="play" class="tlacitko" onclick="gameloop()" type="button" name="button">play</button>
       <button id="playagain" class="tlacitko" onclick="reload()" type="button" name="button">play again</button>
+      <div id="help" class="help">
+        <p class="heading">keyboard controls</p>
+        <p>Up Arrow - move north</p>
+        <p>Left Arrow - move west</p>
+        <p>Right Arrow - move east</p>
+        <p>Down Arrow - move south</p>
+        <p>D - attack/pick</p>
+        <p>F - flee</p>
+      </div>
     </div>
     <div class="keyboard">
       <button id="west" class="tlacitko" type="button" name="button">w</button>
@@ -23,10 +32,9 @@
       <button id="south" class="tlacitko" type="button" name="button">s</button>
       <button id="north" class="tlacitko" type="button" name="button">n</button>
 
-      <button id="attack" class="tlacitko" type="button" name="button">útok</button>
-      <button id="flee" class="tlacitko" type="button" name="button">útěk</button>
-      <button id="inventory" class="tlacitko" type="button" name="button">inventář</button>
-      <button id="map" class="tlacitko" type="button" name="button">mapa</button>
+      <button id="attack" class="tlacitko" type="button" name="button">attack</button>
+      <button id="flee" class="tlacitko" type="button" name="button">flee</button>
+      <button id="helpbutton" class="tlacitko" type="button" name="button">help</button>
     </div>
 
     <!-- seznam zvuku ve hre -->
@@ -50,8 +58,11 @@
       <img id="gold" src="img/gold.png" width="512px" height="512px">
       <img id="ogre" src="img/ogreroom.png" width="512px" height="512px">
       <img id="enemydead" src="img/enemydead.png" width="512px" height="512px">
+      <img id="lootclosed" src="img/lootclosed.png" width="512px" height="512px">
+      <img id="lootopened" src="img/lootopened.png" width="512px" height="512px">
       <img id="coin" src="img/crown-coin.png" width="512px" height="512px">
       <img id="life" src="img/heart.png" width="512px" height="512px">
+      <img id="lifepotion" src="img/heart-bottle.png" width="512px" height="512px">
       <img id="key" src="img/skeleton-key.png" width="512px" height="512px">
       <img id="dagger" src="img/plain-dagger.png" width="512px" height="512px">
       <img id="daggerLoot" src="img/dagger.png" width="512px" height="512px">
@@ -172,6 +183,10 @@
           this.inventory.forEach(function(item, index) {
             if (item instanceof Gold) {
               _this.money += item.value;
+              _this.inventory.splice(index, 1);
+            }
+            else if (item instanceof LifePotion) {
+              _this.hp += item.value;
               _this.inventory.splice(index, 1);
             }
           });
@@ -363,6 +378,15 @@
         $('.text').css('display', 'none');
         $('.header').css('display', 'none');
         $('#playername').css('display', 'none');
+        $('#help').hide();
+        $('#helpbutton').click(function() {
+          var pomoc = $('#help');
+          if (pomoc.is(':hidden')) {
+            pomoc.show('normal');
+          } else {
+            pomoc.hide('normal');
+          }
+        });
         document.getElementById("uvodnihudba").pause();
         $(document).ready(function(){
 
@@ -418,7 +442,7 @@
                 }
                 if (e.keyCode === 88) document.getElementById("audio").play();
               } else {
-                if (e.keyCode === 32 && !pressEx) {
+                if (e.keyCode === 68 && !pressEx) {
                   pressEx = true;
                   player.attack();
                   player.aktualniMistnost.enemy_attack(player);
@@ -435,7 +459,7 @@
             if (e.keyCode === 40) pressEx = false;
             if (e.keyCode === 37) pressEx = false;
             if (e.keyCode === 39) pressEx = false;
-            if (e.keyCode === 32) pressEx = false;
+            if (e.keyCode === 68) pressEx = false;
             if (e.keyCode === 70) pressEx = false;
             if (e.keyCode === 88) document.getElementById("audio").pause();
           }
@@ -456,6 +480,8 @@
 
           //zacne hrat hudba na pozadi
           document.getElementById("pozadihudba").play();
+
+          console.log(generateWorld(10, 5));
 
         });
       }

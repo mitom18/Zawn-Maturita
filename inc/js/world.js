@@ -1,3 +1,22 @@
+function generateWorld(width, height) {
+  //funkce vygeneruje mapu sveta na zaklade podminek, ale nahodne podle seedu (mapu lze reprodukovat)
+  var d = new Date();
+  var seed = d.getTime();
+
+  var svet = new Array();
+  for (var i = 0; i < height; i++) {
+    var rada = new Array();
+    for (var j = 0; j < width; j++) {
+      rada.push(undefined);
+    }
+    svet.push(rada);
+  }
+
+  
+
+  return svet;
+}
+
 var _world = [
   [0,3,2,2,5],
   [4,2,4,2,6],
@@ -18,32 +37,32 @@ function describeWorld(svet) {
     var newRada = new Array();
     item.forEach(function(item2, index2) {
       if (item2 === 0) {
-        var start = new roomStart(index2, index);
-        newRada.push(start);
+        var mistnost = new roomStart(index2, index);
+        newRada.push(mistnost);
       }
       else if (item2 === 1) {
-        var final = new roomFinal(index2, index);
-        newRada.push(final);
+        var mistnost = new roomFinal(index2, index);
+        newRada.push(mistnost);
       }
       else if (item2 === 2) {
-        var path = new emptyPath(index2, index);
-        newRada.push(path);
+        var mistnost = new emptyPath(index2, index);
+        newRada.push(mistnost);
       }
       else if (item2 === 3) {
-        var start = new roomLootGold(index2, index);
-        newRada.push(start);
+        var mistnost = new roomLootGold(index2, index);
+        newRada.push(mistnost);
       }
       else if (item2 === 4) {
-        var start = new roomLootDagger(index2, index);
-        newRada.push(start);
+        var mistnost = new roomLootRandom(index2, index);
+        newRada.push(mistnost);
       }
       else if (item2 === 5) {
-        var start = new roomEnemyOgre(index2, index);
-        newRada.push(start);
+        var mistnost = new roomEnemyOgre(index2, index);
+        newRada.push(mistnost);
       }
       else if (item2 === 6) {
-        var start = new Wall(index2, index);
-        newRada.push(start);
+        var mistnost = new Wall(index2, index);
+        newRada.push(mistnost);
       }
     });
     newSvet.push(newRada);
@@ -207,6 +226,27 @@ class roomLoot extends mapTile {
   }
 }
 
+class roomLootRandom extends roomLoot {
+  constructor(x, y) {
+    var randomIndex = Math.floor(Math.random() * (2 - 0 + 1)) + 0;
+    if (randomIndex == 0) var item = new LifePotion(10);
+    if (randomIndex == 1) var item = new Gold(10);
+    if (randomIndex == 2) var item = new Dagger();
+    super(x, y, item);
+  }
+  intro_text() {
+    if (!this.taken) {
+      this.image = document.getElementById("lootclosed");
+      this.text = "That's a chest! What treasures hide in it?";
+    } else {
+      this.image = document.getElementById("lootopened");
+      this.text = "The chest has been already looted. You will find nothing here.";
+    }
+    Context.context.drawImage(this.image, 80, 50, 250, 250);
+    wrapText(Context.context, this.text, 15, 330, 400, 25);
+  }
+}
+
 class roomLootGold extends roomLoot {
   constructor(x, y) {
     super(x, y, new Gold(15));
@@ -293,7 +333,7 @@ class roomEnemyOgre extends roomEnemy {
   intro_text() {
     if (this.enemy.isAlive()) {
       this.image = document.getElementById("ogre");
-      this.text = "An ogre is attacking you with a huge club! You can attack him by pressing SPACE or flee by pressing F.";
+      this.text = "An ogre is attacking you with a huge club! You can attack him by pressing D or flee by pressing F.";
     } else {
       this.image = document.getElementById("enemydead");
       this.text = "The corpse of a dead ogre lies on the ground.";

@@ -7,10 +7,16 @@ body {
   background-color: #bdbdbd;
   background-image: url("../../img/background.jpg");
   background-position: center;
-  background-repeat: repeat-y;
+  background-repeat: no-repeat;
   background-size: cover;
+  background-color: #071907;
 }
 
+@media (max-width: 1435px) {
+  body {
+    background-size: auto;
+  }
+}
 
 h1 {
   font-family: Bryant;
@@ -22,6 +28,13 @@ h1 {
   text-shadow: 5px 5px #000;
   line-height: 50px;
   -webkit-text-stroke: 1.5px black;
+}
+
+@media (max-width: 1024px) {
+  h1 {
+    margin-top: 25px;
+    line-height: 30px;
+  }
 }
 
 .platno {
@@ -115,12 +128,42 @@ h1 {
   height: 450px;
 }
 
+.platno .help {
+  display: none;
+  position: absolute;
+  width: 90%;
+  height: 90%;
+  left: 5%;
+  top: 5%;
+  margin: auto;
+  background-color: #000;
+  color: #fff;
+  z-index: 15;
+  font-family: Bryant;
+  font-size: 18px;
+  text-align: center;
+  text-transform: uppercase;
+  border: 1px solid #fff;
+}
+
+.platno .help .heading {
+  margin-top: 60px;
+  margin-bottom: 15px;
+  font-size: 30px;
+  text-decoration: underline;
+}
+
 .keyboard {
   position: relative;
   margin-left: auto;
   margin-right: auto;
-  width: 800px;
+  width: 500px;
   margin-top: 30px;
+}
+@media (max-width: 1024px) {
+  .keyboard {
+    margin-top: 15px;
+  }
 }
 .keyboard .tlacitko {
   font-family: Bryant;
@@ -169,15 +212,9 @@ h1 {
   left: 300px;
   top: 40px;
 }
-#inventory {
+#helpbutton {
   position: absolute;
   padding: 8px 25px;
-  left: 450px;
-  top: 40px;
-}
-#map {
-  position: absolute;
-  padding: 8px 25px;
-  left: 620px;
+  left: 415px;
   top: 40px;
 }
