@@ -11,14 +11,14 @@ class Item {
 
 class Gold extends Item {
   constructor(amt) {
-    super("Coin", "A round coin with x stamped on the front.", amt);
+    super("Coin", "A round coin with {0} stamped on the front.".format(amt), amt);
     this.image = document.getElementById("coin");
   }
 }
 
 class LifePotion extends Item {
   constructor(amt) {
-    super("Potion", "A potion that restores {0} HP.".format(amt), amt);
+    super("Healing potion", "A potion that restores {0} HP.".format(amt), amt);
     this.image = document.getElementById("lifepotion");
   }
 }

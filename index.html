@@ -55,6 +55,7 @@
       <img id="entrance" src="img/dungeon-gate.png" width="512px" height="512px">
       <img id="path" src="img/path.png" width="512px" height="512px">
       <img id="exit" src="img/dungeon-light.png" width="512px" height="512px">
+      <img id="cage" src="img/cage.png" width="512px" height="512px">
       <img id="gold" src="img/gold.png" width="512px" height="512px">
       <img id="ogre" src="img/ogreroom.png" width="512px" height="512px">
       <img id="enemydead" src="img/enemydead.png" width="512px" height="512px">
@@ -65,6 +66,7 @@
       <img id="lifepotion" src="img/heart-bottle.png" width="512px" height="512px">
       <img id="key" src="img/skeleton-key.png" width="512px" height="512px">
       <img id="dagger" src="img/plain-dagger.png" width="512px" height="512px">
+      <img id="rock" src="img/rock.png" width="512px" height="512px">
       <img id="daggerLoot" src="img/dagger.png" width="512px" height="512px">
     </div>
 
@@ -90,6 +92,8 @@
         if (audio) document.getElementById(audio).pause();
       }
       */
+
+      //nastaveni hlasitosti hudby
       var uvodnihudba = document.getElementById("uvodnihudba");
       uvodnihudba.volume = 0.15;
       var combathudba = document.getElementById("combathudba");
@@ -100,8 +104,6 @@
       victoryhudba.volume = 0.35;
       var defeathudba = document.getElementById("defeathudba");
       defeathudba.volume = 0.35;
-
-
 
       // funkce pro inicializi canvas elementu
       var Context = {
@@ -153,13 +155,11 @@
         location.reload();
       }
 
-
-
       //hrac a jeho akce
       class Player {
         constructor(name) {
           this.name = name;
-          this.inventory = [new Dagger(), new Dagger(), new Dagger(), new Dagger(), new Dagger(), new Dagger(), new Dagger(), new Dagger(), new Gold(20)];
+          this.inventory = [new Rock(), new Gold(5)];
           this.money = 0;
           this.hp = 100;
           this.locationX = startingPositionX;
@@ -243,6 +243,7 @@
           this.locationX += dx;
           this.locationY += dy;
 
+          //kontrola, jestli se na policko muze hrac pohnout
           if (this.locationX < 0) this.locationX = 0;
           if (this.locationX > (world[0].length - 1)) this.locationX = world[0].length - 1;
           if (this.locationY < 0) this.locationY = 0;
@@ -253,6 +254,7 @@
             this.locationY = puvY;
           }
 
+          //vykresleni mistnosti po vstupu do ni
           Context.context.save();
           this.platno = document.getElementById("canvas")
           Context.context.clearRect(0, 0, this.platno.width/2+10, this.platno.height)
@@ -262,6 +264,7 @@
           this.aktualniMistnost.intro_text(this);
           this.aktualniMistnost.modify_player(this);
 
+          //kontrola, jestli je hrac zivy a jestli uz nevyhral + co se ma v techto pripadech provest
           if (this.isAlive()) {
             this.printInventory(480, 315);
             drawMap(480, 80, this.locationX, this.locationY, _world);
@@ -325,9 +328,11 @@
               }
             }
           });
+          //provede se utok
           Context.context.clearRect(15, 315, 400, 400);
           wrapText(Context.context, "You use {0} against {1}!".format(best_weapon.name, this.enemy.name), 15, 330, 400, 25);
           this.enemy.hp -= Math.floor(Math.random() * (best_weapon.damagemax - best_weapon.damagemin + 1)) + best_weapon.damagemin;
+          //je nepritel stale zivy? + dalsi vypisovani
           if (!this.enemy.isAlive()) {
             this.inCombat = false;
             this.aktualniMistnost.addLoot(this);
@@ -392,7 +397,7 @@
 
           Context.create("canvas"); //inicializace canvas elementu
 
-          var described_world = describeWorld(_world); //inicializace sveta
+          window.described_world = describeWorld(_world); //inicializace sveta
 
           var player = new Player(playername); //inicialize hrace
 
@@ -413,6 +418,9 @@
             if (player.isAlive() && !player.victory && player.inCombat) {
               player.attack();
               player.aktualniMistnost.enemy_attack(player);
+            }
+            else if (player.isAlive() && !player.victory && player.aktualniMistnost instanceof roomLoot) {
+              player.aktualniMistnost.addLoot(player);
             }
           };
           document.getElementById("flee").onclick = function(){
@@ -439,6 +447,9 @@
                 if (e.keyCode === 39 && !pressEx) {
                   pressEx = true;
                   player.moveEast(described_world);
+                }
+                if (e.keyCode === 68 && !pressEx && player.aktualniMistnost instanceof roomLoot) {
+                  player.aktualniMistnost.addLoot(player);
                 }
                 if (e.keyCode === 88) document.getElementById("audio").play();
               } else {
@@ -480,8 +491,6 @@
 
           //zacne hrat hudba na pozadi
           document.getElementById("pozadihudba").play();
-
-          console.log(generateWorld(10, 5));
 
         });
       }

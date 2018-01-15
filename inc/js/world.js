@@ -1,33 +1,169 @@
-function generateWorld(width, height) {
+//startovaci souradnice hrace a seed jako globalni promenne
+var startingPositionX;
+var startingPositionY;
+var level = 1;
+var levelMax = 2;
+var seed;
+
+function generateWorld(width, height, uroven) {
   //funkce vygeneruje mapu sveta na zaklade podminek, ale nahodne podle seedu (mapu lze reprodukovat)
   var d = new Date();
-  var seed = d.getTime();
+  seed = d.getTime();
 
+  //napln celou mapku prazdnymi mistnostmi
   var svet = new Array();
   for (var i = 0; i < height; i++) {
     var rada = new Array();
     for (var j = 0; j < width; j++) {
-      rada.push(undefined);
+      rada.push(2);
     }
     svet.push(rada);
   }
 
-  
+  if (uroven == 1 || uroven == 2) {
 
+    if (seed % 2 == 0) {
+      //urceni startu a cile
+      svet[0][0] = 0;
+      startingPositionX = 0;
+      startingPositionY = 0;
+      svet[height-1][width-1] = 1;
+      //urceni zdi
+      if (seed % 4 == 0) {
+        for (var i = 0; i < height; i++) {
+          if (i % 2 != 0) {
+            svet[i][Math.floor(width/2)] = 2;
+          } else {
+            svet[i][Math.floor(width/2)] = 6;
+          }
+        }
+        for (var i = 0; i < width; i++) {
+          if (i % 3 <= 1) {
+            svet[Math.floor(height/2)][i] = 6;
+          }
+        }
+      } else {
+        for (var i = 0; i < width; i++) {
+          if (i % 3 > 1) {
+            svet[Math.floor(height/2)][i] = 2;
+          } else {
+            svet[Math.floor(height/2)][i] = 6;
+          }
+        }
+        for (var i = 0; i < height; i++) {
+          if (i % 2 != 0) {
+            svet[i][Math.floor(width/2)] = 6;
+          }
+        }
+      }
+      //urceni ostatnich mistnosti
+      if (seed % 10 == 1 || seed % 10 == 4 || seed % 10 == 7) {
+        svet[height-1][Math.floor(width/4)] = 4;
+        svet[0][Math.floor(width*0.75)] = 3;
+      }
+      else if (seed % 10 == 2 || seed % 10 == 3 || seed % 10 == 8) {
+        svet[height-1][Math.floor(width/4)] = 3;
+        svet[0][Math.floor(width*0.75)] = 4;
+      }
+      else if (seed % 10 == 9 || seed % 10 == 5 || seed % 10 == 0) {
+        svet[height-1][Math.floor(width/3)] = 3;
+        svet[0][Math.floor(width*0.9)] = 4;
+      }
+      while (true) {
+        var randomX = Math.floor(Math.random() * (width - 1 - 0 + 1)) + 0;
+        var randomY = Math.floor(Math.random() * (height - 1 - 0 + 1)) + 0;
+        if (svet[randomY][randomX] == 2) {
+          svet[randomY][randomX] = 5;
+          break;
+        }
+      }
+
+      /*
+      svet[Math.floor(height/2)][Math.floor(width/2)] = 6;
+      svet[Math.floor(height/2)][Math.floor(width/2)-1] = 4;
+      svet[Math.floor(height/2)][Math.floor(width/2)+1] = 5;
+      svet[Math.floor(height/2)-1][Math.floor(width/2)] = 3;
+      svet[Math.floor(height/2)+1][Math.floor(width/2)] = 7;
+      */
+
+    } else {
+      //urceni startu a cile
+      svet[height-1][0] = 0;
+      startingPositionX = 0;
+      startingPositionY = height-1;
+      svet[0][width-1] = 1;
+      //urceni zdi
+      if (seed % 5 == 0) {
+        for (var i = 0; i < height; i++) {
+          if (i % 2 != 0) {
+            svet[i][Math.floor(width/2)] = 2;
+          } else {
+            svet[i][Math.floor(width/2)] = 6;
+          }
+        }
+        for (var i = 0; i < width; i++) {
+          if (i % 3 <= 1) {
+            svet[Math.floor(height/2)][i] = 6;
+          }
+        }
+      } else {
+        for (var i = 0; i < width; i++) {
+          if (i % 3 > 1) {
+            svet[Math.floor(height/2)][i] = 2;
+          } else {
+            svet[Math.floor(height/2)][i] = 6;
+          }
+        }
+        for (var i = 0; i < height; i++) {
+          if (i % 2 != 0) {
+            svet[i][Math.floor(width/2)] = 6;
+          }
+        }
+      }
+      //urceni ostatnich mistnosti
+      if (seed % 10 == 1 || seed % 10 == 4 || seed % 10 == 7 || seed % 10 == 6) {
+        svet[0][Math.floor(width/4)] = 4;
+        svet[height-1][Math.floor(width*0.75)] = 3;
+      }
+      else if (seed % 10 == 2 || seed % 10 == 3 || seed % 10 == 8) {
+        svet[0][Math.floor(width/4)] = 3;
+        svet[height-1][Math.floor(width*0.75)] = 4;
+      }
+      else if (seed % 10 == 9 || seed % 10 == 5 || seed % 10 == 0) {
+        svet[0][Math.floor(width/3)] = 3;
+        svet[height-1][Math.floor(width*0.9)] = 4;
+      }
+      while (true) {
+        var randomX = Math.floor(Math.random() * (width - 1 - 0 + 1)) + 0;
+        var randomY = Math.floor(Math.random() * (height - 1 - 0 + 1)) + 0;
+        if (svet[randomY][randomX] == 2) {
+          svet[randomY][randomX] = 5;
+          break;
+        }
+      }
+    }
+
+      /*
+      svet[Math.floor(height/2)][Math.floor(width/2)] = 6;
+      svet[Math.floor(height/2)-1][Math.floor(width/2)] = 4;
+      svet[Math.floor(height/2)+1][Math.floor(width/2)] = 5;
+      */
+  }
+
+  console.log(seed);
+  console.log(svet);
   return svet;
 }
 
-var _world = [
+var _world = generateWorld(7, 5, level);
+
+var _worldPuv = [
   [0,3,2,2,5],
   [4,2,4,2,6],
   [3,6,6,5,2],
   [2,2,4,3,2],
   [5,3,2,2,1]
 ]
-
-//startovaci souradnice hrace
-var startingPositionX = 0;
-var startingPositionY = 0;
 
 function describeWorld(svet) {
   //funkce doplni do sveta instance trid mistnosti na zaklade cisel v puvodni mapce
@@ -64,6 +200,10 @@ function describeWorld(svet) {
         var mistnost = new Wall(index2, index);
         newRada.push(mistnost);
       }
+      else if (item2 === 7) {
+        var mistnost = new roomLootDagger(index2, index);
+        newRada.push(mistnost);
+      }
     });
     newSvet.push(newRada);
   });
@@ -71,57 +211,63 @@ function describeWorld(svet) {
 }
 
 function drawMap(x, y, playerX, playerY, world) {
-    Context.context.save();
-    Context.context.clearRect(x, y-30, world.length*15, world[0].length*15+30);
-    Context.context.fillText("Map:", x, y-15);
-    var Xpuv = x;
-    var Ypuv = y;
-    var xova = x;
-    var yova = y;
-    world.forEach(function(item, index) {
-      item.forEach(function(item2, index2) {
-        if (item2 === 0) {
-            Context.context.fillStyle = 'pink';
-            Context.context.fillRect(xova, yova, 15, 15);
-            xova += 15;
-        }
-        else if (item2 === 1) {
-            Context.context.fillStyle = 'yellow';
-            Context.context.fillRect(xova, yova, 15, 15);
-            xova += 15;
-        }
-        else if (item2 === 2) {
-            Context.context.fillStyle = 'grey';
-            Context.context.fillRect(xova, yova, 15, 15);
-            xova += 15;
-        }
-        else if (item2 === 3) {
-            Context.context.fillStyle = 'gold';
-            Context.context.fillRect(xova, yova, 15, 15);
-            xova += 15;
-        }
-        else if (item2 === 4) {
-            Context.context.fillStyle = 'silver';
-            Context.context.fillRect(xova, yova, 15, 15);
-            xova += 15;
-        }
-        else if (item2 === 5) {
-            Context.context.fillStyle = 'red';
-            Context.context.fillRect(xova, yova, 15, 15);
-            xova += 15;
-        }
-        else if (item2 === 6) {
-            Context.context.fillStyle = 'black';
-            Context.context.fillRect(xova, yova, 15, 15);
-            xova += 15;
-        }
-      });
-      xova = Xpuv;
-      yova += 15;
+  //funkce vykresluje grafickou mapku na zaklade cisel v puvodni mapce
+  Context.context.save();
+  Context.context.clearRect(x, y-30, world.length*15, world[0].length*15+30);
+  Context.context.fillText("Map:", x, y-15);
+  var Xpuv = x;
+  var Ypuv = y;
+  var xova = x;
+  var yova = y;
+  world.forEach(function(item, index) {
+    item.forEach(function(item2, index2) {
+      if (item2 === 0) {
+          Context.context.fillStyle = 'pink';
+          Context.context.fillRect(xova, yova, 15, 15);
+          xova += 15;
+      }
+      else if (item2 === 1) {
+          Context.context.fillStyle = 'yellow';
+          Context.context.fillRect(xova, yova, 15, 15);
+          xova += 15;
+      }
+      else if (item2 === 2) {
+          Context.context.fillStyle = 'grey';
+          Context.context.fillRect(xova, yova, 15, 15);
+          xova += 15;
+      }
+      else if (item2 === 3) {
+          Context.context.fillStyle = 'gold';
+          Context.context.fillRect(xova, yova, 15, 15);
+          xova += 15;
+      }
+      else if (item2 === 4) {
+          Context.context.fillStyle = 'silver';
+          Context.context.fillRect(xova, yova, 15, 15);
+          xova += 15;
+      }
+      else if (item2 === 5) {
+          Context.context.fillStyle = 'red';
+          Context.context.fillRect(xova, yova, 15, 15);
+          xova += 15;
+      }
+      else if (item2 === 6) {
+          Context.context.fillStyle = 'black';
+          Context.context.fillRect(xova, yova, 15, 15);
+          xova += 15;
+      }
+      else if (item2 === 7) {
+          Context.context.fillStyle = 'orange';
+          Context.context.fillRect(xova, yova, 15, 15);
+          xova += 15;
+      }
     });
-    Context.context.fillStyle = 'blue';
-    Context.context.fillRect(Xpuv+playerX*15, Ypuv+playerY*15, 15, 15);
-    Context.context.restore();
+    xova = Xpuv;
+    yova += 15;
+  });
+  Context.context.fillStyle = 'blue';
+  Context.context.fillRect(Xpuv+playerX*15, Ypuv+playerY*15, 15, 15);
+  Context.context.restore();
 }
 
 function stepInTile(x, y, world) {
@@ -137,8 +283,10 @@ class mapTile {
     this.x = x;
     this.y = y;
   }
-  intro_text() {}
-  modify_player() {
+  intro_text() {
+    return null;
+  }
+  modify_player(player) {
     return null;
   }
 }
@@ -146,7 +294,11 @@ class mapTile {
 class roomStart extends mapTile {
   intro_text() {
     this.image = document.getElementById("entrance");
-    this.text = "You find yourself in a room with flickering torches on the walls. You can make out two paths, each equally as dark and foreboding.";
+    if (level == 1) {
+      this.text = "You find yourself in a room with flickering torches on the walls. You can make out several paths, each equally as dark and foreboding.";
+    } else {
+      this.text = "You go deeper into the dungeon...";
+    }
     Context.context.drawImage(this.image, 65, 25, 250, 250);
     wrapText(Context.context, this.text, 15, 330, 400, 25);
   }
@@ -184,16 +336,24 @@ class emptyPath extends mapTile {
 
 class roomFinal {
   intro_text(player) {
-    this.image = document.getElementById("exit");
     this.klic = false;
     for (var item of player.inventory) {
       if (item instanceof Key) {
+        this.image = document.getElementById("exit");
         this.text = "The key matches and you unlock the door! You are free, you made it!";
         this.klic = true;
         break;
       }
     };
-    if (!this.klic) this.text = "You have to find a key to unlock the exit door.";
+    if (!this.klic) {
+      if (level == levelMax) {
+        this.image = document.getElementById("exit");
+        this.text = "You have to find a key to unlock the exit door.";
+      } else {
+        this.image = document.getElementById("cage");
+        this.text = "You have to find a key to continue your journey.";
+      }
+    }
     Context.context.drawImage(this.image, 75, 30, 250, 250);
     wrapText(Context.context, this.text, 15, 330, 400, 25);
   }
@@ -202,7 +362,25 @@ class roomFinal {
     document.getElementById("combathudba").pause();
     document.getElementById("combathudba").currentTime = 0;
     document.getElementById("pozadihudba").play();
-    if (this.klic) player.victory = true;
+    if (this.klic) {
+      if (level == levelMax) {
+        player.victory = true;
+      } else {
+        level += 1;
+        _world = generateWorld(10, 5, level); //generace noveho levelu
+        player.inventory.forEach(function(item, index) {
+          if (item instanceof Key) {
+            player.inventory.splice(index, 1);
+          }
+        });
+        player.locationX = startingPositionX;
+        player.locationY = startingPositionY;
+        window.described_world = describeWorld(_world); //inicializace noveho levelu
+        var novaAktualniMistnost = stepInTile(startingPositionX, startingPositionY, described_world);
+        Context.context.clearRect(0, 0, player.platno.width/2+10, player.platno.height);
+        novaAktualniMistnost.intro_text();
+      }
+    }
   }
 }
 
@@ -214,7 +392,14 @@ class roomLoot extends mapTile {
     this.taken = false;
   }
   addLoot(player) {
-    if (!this.taken) player.inventory.push(this.item);
+    if (!this.taken) {
+      player.inventory.push(this.item);
+      player.printInventory(480, 315);
+      Context.context.clearRect(0, 0, player.platno.width/2+10, player.platno.height);
+      Context.context.drawImage(document.getElementById("lootopened"), 80, 50, 250, 250);
+      Context.context.drawImage(this.item.image, 175, 180, 30, 30);
+      wrapText(Context.context, "You found a {0}!".format(this.item.name), 15, 330, 400, 25);
+    }
     this.taken = true;
   }
   modify_player(player) {
@@ -222,7 +407,6 @@ class roomLoot extends mapTile {
     document.getElementById("combathudba").pause();
     document.getElementById("combathudba").currentTime = 0;
     document.getElementById("pozadihudba").play();
-    this.addLoot(player);
   }
 }
 
@@ -253,11 +437,11 @@ class roomLootGold extends roomLoot {
   }
   intro_text() {
     if (!this.taken) {
-      this.image = document.getElementById("gold");
-      this.text = "You notice something shiny in the corner. It's a coin! You pick it up.";
+      this.image = document.getElementById("lootclosed");
+      this.text = "That's a chest! What treasures hide in it?";
     } else {
-      this.image = document.getElementById("path");
-      this.text = "Another unremarkable part of the dungeon. You must forge onwards.";
+      this.image = document.getElementById("lootopened");
+      this.text = "The chest has been already looted. You will find nothing here.";
     }
     Context.context.drawImage(this.image, 80, 50, 250, 250);
     wrapText(Context.context, this.text, 15, 330, 400, 25);
@@ -270,11 +454,11 @@ class roomLootDagger extends roomLoot {
   }
   intro_text() {
     if (!this.taken) {
-      this.image = document.getElementById("daggerLoot");
-      this.text = "You notice something shiny in the corner. It's a dagger! You pick it up.";
+      this.image = document.getElementById("lootclosed");
+      this.text = "That's a chest! What treasures hide in it?";
     } else {
-      this.image = document.getElementById("path");
-      this.text = "Another unremarkable part of the dungeon. You must forge onwards.";
+      this.image = document.getElementById("lootopened");
+      this.text = "The chest has been already looted. You will find nothing here.";
     }
     Context.context.drawImage(this.image, 80, 50, 250, 250);
     wrapText(Context.context, this.text, 15, 330, 400, 25);

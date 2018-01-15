@@ -4,12 +4,12 @@
 }
 
 body {
-  background-color: #bdbdbd;
+  background-color: #071907;
   background-image: url("../../img/background.jpg");
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
-  background-color: #071907;
+  overflow: hidden;
 }
 
 @media (max-width: 1435px) {
@@ -32,8 +32,7 @@ h1 {
 
 @media (max-width: 1024px) {
   h1 {
-    margin-top: 25px;
-    line-height: 30px;
+    display: none;
   }
 }
 
@@ -47,6 +46,11 @@ h1 {
   height: 450px;
   background-color: #000;
   border: 2px solid gray;
+}
+@media (max-width: 1024px) {
+  .platno {
+    margin-top: 35px;
+  }
 }
 
 .platno .header {
@@ -162,7 +166,7 @@ h1 {
 }
 @media (max-width: 1024px) {
   .keyboard {
-    margin-top: 15px;
+    margin-top: 10px;
   }
 }
 .keyboard .tlacitko {
