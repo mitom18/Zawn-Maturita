@@ -12,9 +12,15 @@ body {
   overflow: hidden;
 }
 
-@media (max-width: 1435px) {
+@media (max-width: 1440px) {
   body {
     background-size: auto;
+  }
+}
+
+@media (max-width: 425px) {
+  body {
+    overflow: visible;
   }
 }
 
@@ -29,6 +35,14 @@ h1 {
   line-height: 50px;
   -webkit-text-stroke: 1.5px black;
 }
+
+@media (max-width: 1440px) {
+  h1 {
+    margin-top: 25px;
+    line-height: 20px;
+  }
+}
+
 
 @media (max-width: 1024px) {
   h1 {
@@ -55,7 +69,7 @@ h1 {
 
 .platno .header {
   position: relative;
-  top: -400px;
+  top: -415px;
   text-align: center;
   text-transform: uppercase;
   z-index: 10;
@@ -67,27 +81,28 @@ h1 {
 
 .platno .text {
   position: relative;
-  top: -350px;
+  top: -400px;
   text-align: center;
   text-transform: uppercase;
   z-index: 10;
   font-family: Bryant;
   color: #fff;
+  margin-top: 5px;
   font-size: 20px;
   text-align: center;
 }
 
 .platno #play {
   position: relative;
-  top: -290px;
+  top: -370px;
   text-align: center;
   text-transform: uppercase;
   z-index: 10;
 }
 
-.platno #playername {
+.platno #playername, .platno #seedinput {
   position: relative;
-  top: -360px;
+  top: -415px;
   text-align: center;
   z-index: 10;
   font-family: Bryant;
@@ -151,20 +166,26 @@ h1 {
 }
 
 .platno .help .heading {
-  margin-top: 60px;
+  margin-top: 30px;
   margin-bottom: 15px;
   font-size: 30px;
   text-decoration: underline;
+}
+.platno .help .seed {
+  position: absolute;
+  right: 15px;
+  bottom: 10px;
+  color: #9B9B9B;
 }
 
 .keyboard {
   position: relative;
   margin-left: auto;
   margin-right: auto;
-  width: 500px;
+  width: 550px;
   margin-top: 30px;
 }
-@media (max-width: 1024px) {
+@media (max-width: 1440px) {
   .keyboard {
     margin-top: 10px;
   }
@@ -207,18 +228,23 @@ h1 {
 #attack {
   position: absolute;
   padding: 8px 25px;
-  left: 166px;
+  left: 150px;
   top: 40px;
 }
 #flee {
   position: absolute;
   padding: 8px 25px;
-  left: 300px;
+  left: 280px;
   top: 40px;
 }
 #helpbutton {
   position: absolute;
   padding: 8px 25px;
-  left: 415px;
+  left: 390px;
+  top: 40px;
+}
+#escape {
+  position: absolute;
+  left: 500px;
   top: 40px;
 }

@@ -47,7 +47,7 @@ class Rock extends Weapon {
 
 class Dagger extends Weapon {
   constructor() {
-    super("Dagger", "A small dagger with some rust. Somewhat more dangerous than a rock.", 10, 7, 11);
+    super("Dagger", "A small dagger with some rust. Somewhat more dangerous than a rock.", 11, 7, 11);
     this.image = document.getElementById("dagger")
   }
 }

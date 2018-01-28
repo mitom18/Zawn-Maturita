@@ -12,8 +12,10 @@
     <div class="platno">
       <canvas id="canvas" width="800px" height="450px"></canvas>
       <div class="header">zawn</div><br>
-      <div class="text">enter your name:</div><br>
-      <input id="playername" type="text" name="playername" value=""><br>
+      <div class="text">your name:</div><br>
+      <input id="playername" type="text" name="playername" value="" placeholder="needed"><br>
+      <div class="text">seed for world generator:</div><br>
+      <input id="seedinput" type="text" name="seedinput" value="" placeholder="optional"><br>
       <button id="play" class="tlacitko" onclick="gameloop()" type="button" name="button">play</button>
       <button id="playagain" class="tlacitko" onclick="reload()" type="button" name="button">play again</button>
       <div id="help" class="help">
@@ -22,8 +24,10 @@
         <p>Left Arrow - move west</p>
         <p>Right Arrow - move east</p>
         <p>Down Arrow - move south</p>
-        <p>D - attack/pick</p>
-        <p>F - flee</p>
+        <p>D - attack/pick/buy</p>
+        <p>F - flee/sell</p>
+        <p>Escape - enable leaving merchant</p>
+        <div id="seedshow" class="seed"></div>
       </div>
     </div>
     <div class="keyboard">
@@ -35,6 +39,7 @@
       <button id="attack" class="tlacitko" type="button" name="button">attack</button>
       <button id="flee" class="tlacitko" type="button" name="button">flee</button>
       <button id="helpbutton" class="tlacitko" type="button" name="button">help</button>
+      <button id="escape" class="tlacitko" type="button" name="button">o</button>
     </div>
 
     <!-- seznam zvuku ve hre -->
@@ -68,9 +73,11 @@
       <img id="dagger" src="img/plain-dagger.png" width="512px" height="512px">
       <img id="rock" src="img/rock.png" width="512px" height="512px">
       <img id="daggerLoot" src="img/dagger.png" width="512px" height="512px">
+      <img id="merchant" src="img/merchant.png" width="512px" height="512px">
     </div>
 
     <script type="text/javascript" src="inc/js/jquery-3.2.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/seedrandom/2.4.3/seedrandom.min.js"></script>
     <script type="text/javascript" src="inc/js/items.js"></script>
     <script type="text/javascript" src="inc/js/enemies.js"></script>
     <script type="text/javascript" src="inc/js/world.js"></script>
@@ -165,6 +172,7 @@
           this.locationX = startingPositionX;
           this.locationY = startingPositionY;
           this.inCombat = false;
+          this.inShop = false;
           this.victory = false;
         }
         isAlive() {
@@ -172,7 +180,7 @@
         }
         printInventory(x, y) {
           Context.context.save();
-          Context.context.clearRect(x, y, 165, 108);
+          Context.context.clearRect(x, y, 365, 108);
           var Xpuv = x;
           var Ypuv = y;
           var xova = x;
@@ -190,7 +198,7 @@
               _this.inventory.splice(index, 1);
             }
           });
-          Context.context.clearRect(x, y-65, 130, 50);
+          Context.context.clearRect(x, y-65, 230, 50);
           Context.context.fillText("Name: {0}".format(this.name), x, y-45);
           Context.context.drawImage(document.getElementById("life"), x, y-31, 20, 20);
           Context.context.fillText(this.hp, x+25, y-15);
@@ -376,6 +384,7 @@
       //funkce spusteni jadra hry
       function gameloop() {
         var playername = document.getElementById("playername").value;
+        window.seed = document.getElementById("seedinput").value;
         if (!playername) {
           gameloop();
         }
@@ -383,6 +392,7 @@
         $('.text').css('display', 'none');
         $('.header').css('display', 'none');
         $('#playername').css('display', 'none');
+        $('#seedinput').css('display', 'none');
         $('#help').hide();
         $('#helpbutton').click(function() {
           var pomoc = $('#help');
@@ -397,22 +407,37 @@
 
           Context.create("canvas"); //inicializace canvas elementu
 
+          window._world = generateWorld(7, 5, level);
           window.described_world = describeWorld(_world); //inicializace sveta
 
           var player = new Player(playername); //inicialize hrace
 
           //inicializace ovladacich tlacitek
           document.getElementById("north").onclick = function(){
-            if (player.isAlive() && !player.victory && !player.inCombat) player.moveNorth(described_world);
+            if (player.isAlive() && !player.victory && !player.inCombat && !player.inShop) player.moveNorth(described_world);
           };
           document.getElementById("south").onclick = function(){
-            if (player.isAlive() && !player.victory && !player.inCombat) player.moveSouth(described_world);
+            if (player.isAlive() && !player.victory && !player.inCombat && !player.inShop) player.moveSouth(described_world);
           };
           document.getElementById("west").onclick = function(){
-            if (player.isAlive() && !player.victory && !player.inCombat) player.moveWest(described_world);
+            if (player.isAlive() && !player.victory && !player.inCombat) {
+              if (player.inShop && player.aktualniMistnost instanceof roomMerchant) {
+                player.aktualniMistnost.choosingItem(false);
+                player.aktualniMistnost.printInventory(20, 255);
+              } else {
+                player.moveWest(described_world);
+              }
+            }
           };
           document.getElementById("east").onclick = function(){
-            if (player.isAlive() && !player.victory && !player.inCombat) player.moveEast(described_world);
+            if (player.isAlive() && !player.victory && !player.inCombat) {
+              if (player.inShop && player.aktualniMistnost instanceof roomMerchant) {
+                player.aktualniMistnost.choosingItem(true);
+                player.aktualniMistnost.printInventory(20, 255);
+              } else {
+                player.moveEast(described_world);
+              }
+            }
           };
           document.getElementById("attack").onclick = function(){
             if (player.isAlive() && !player.victory && player.inCombat) {
@@ -422,9 +447,22 @@
             else if (player.isAlive() && !player.victory && player.aktualniMistnost instanceof roomLoot) {
               player.aktualniMistnost.addLoot(player);
             }
+            else if (player.inShop && player.aktualniMistnost instanceof roomMerchant && player.aktualniMistnost.canTrade) {
+              player.aktualniMistnost.buyItem(player);
+              player.printInventory(480, 315);
+            }
           };
           document.getElementById("flee").onclick = function(){
-            if (player.isAlive() && !player.victory && player.inCombat) player.flee(described_world);
+            if (player.isAlive() && !player.victory && player.inCombat) {
+              player.flee(described_world);
+            }
+            else if (player.inShop && player.aktualniMistnost instanceof roomMerchant && player.aktualniMistnost.canTrade) {
+              player.aktualniMistnost.sellItem(player);
+              player.printInventory(480, 315);
+            }
+          };
+          document.getElementById("escape").onclick = function(){
+            if (player.inShop && player.aktualniMistnost instanceof roomMerchant) player.inShop = false;
           };
 
           //inicialize ovladani pres klavesnici
@@ -434,22 +472,48 @@
               if (!player.inCombat) {
                 if (e.keyCode === 38 && !pressEx) {
                   pressEx = true;
-                  player.moveNorth(described_world);
+                  if (!player.inShop) player.moveNorth(described_world);
                 }
                 if (e.keyCode === 40 && !pressEx) {
                   pressEx = true;
-                  player.moveSouth(described_world);
+                  if (!player.inShop) player.moveSouth(described_world);
                 }
                 if (e.keyCode === 37 && !pressEx) {
                   pressEx = true;
-                  player.moveWest(described_world);
+                  if (player.inShop && player.aktualniMistnost instanceof roomMerchant) {
+                    player.aktualniMistnost.choosingItem(false);
+                    player.aktualniMistnost.printInventory(20, 255);
+                  } else {
+                    player.moveWest(described_world);
+                  }
                 }
                 if (e.keyCode === 39 && !pressEx) {
                   pressEx = true;
-                  player.moveEast(described_world);
+                  if (player.inShop && player.aktualniMistnost instanceof roomMerchant) {
+                    player.aktualniMistnost.choosingItem(true);
+                    player.aktualniMistnost.printInventory(20, 255);
+                  } else {
+                    player.moveEast(described_world);
+                  }
                 }
-                if (e.keyCode === 68 && !pressEx && player.aktualniMistnost instanceof roomLoot) {
-                  player.aktualniMistnost.addLoot(player);
+                if (e.keyCode === 68 && !pressEx) {
+                  pressEx = true;
+                  if (player.aktualniMistnost instanceof roomLoot) player.aktualniMistnost.addLoot(player);
+                  else if (player.inShop && player.aktualniMistnost instanceof roomMerchant && player.aktualniMistnost.canTrade) {
+                    player.aktualniMistnost.buyItem(player);
+                    player.printInventory(480, 315);
+                  }
+                }
+                if (e.keyCode === 70 && !pressEx) {
+                  pressEx = true;
+                  if (player.inShop && player.aktualniMistnost instanceof roomMerchant && player.aktualniMistnost.canTrade) {
+                    player.aktualniMistnost.sellItem(player);
+                    player.printInventory(480, 315);
+                  }
+                }
+                if (e.keyCode === 27 && !pressEx) {
+                  pressEx = true;
+                  if (player.inShop && player.aktualniMistnost instanceof roomMerchant) player.inShop = false;
                 }
                 if (e.keyCode === 88) document.getElementById("audio").play();
               } else {
@@ -472,6 +536,7 @@
             if (e.keyCode === 39) pressEx = false;
             if (e.keyCode === 68) pressEx = false;
             if (e.keyCode === 70) pressEx = false;
+            if (e.keyCode === 27) pressEx = false;
             if (e.keyCode === 88) document.getElementById("audio").pause();
           }
 
