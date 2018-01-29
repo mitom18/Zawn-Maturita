@@ -7,11 +7,17 @@ var levelMax = 2;
 function generateWorld(width, height, uroven) {
   //funkce vygeneruje mapu sveta na zaklade podminek, ale nahodne podle seedu (mapu lze reprodukovat)
   if (!seed) {
-    var d = new Date();
-    window.seed = d.getTime();
+    var cookietoseed = getCookie("seed");
+    if (cookietoseed != "") {
+      window.seed = cookietoseed;
+    } else {
+      var d = new Date();
+      window.seed = d.getTime();
+    }
   }
 
   console.log(seed);
+  console.log(getCookie("seed"));
   $('#seedshow').text("world seed: " + seed.toString());
   Math.seedrandom(seed.toString());
 
@@ -248,40 +254,32 @@ function describeWorld(svet) {
     item.forEach(function(item2, index2) {
       if (item2 === 0) {
         var mistnost = new roomStart(index2, index);
-        newRada.push(mistnost);
       }
       else if (item2 === 1) {
         var mistnost = new roomFinal(index2, index);
-        newRada.push(mistnost);
       }
       else if (item2 === 2 || item2 === 10) {
         var mistnost = new emptyPath(index2, index);
-        newRada.push(mistnost);
       }
       else if (item2 === 3) {
         var mistnost = new roomLootGold(index2, index);
-        newRada.push(mistnost);
       }
       else if (item2 === 4) {
         var mistnost = new roomLootRandom(index2, index);
-        newRada.push(mistnost);
       }
       else if (item2 === 5) {
         var mistnost = new roomEnemyOgre(index2, index);
-        newRada.push(mistnost);
       }
       else if (item2 === 6) {
         var mistnost = new Wall(index2, index);
-        newRada.push(mistnost);
       }
       else if (item2 === 7) {
         var mistnost = new roomLootDagger(index2, index);
-        newRada.push(mistnost);
       }
       else if (item2 === 8) {
         var mistnost = new roomMerchant(index2, index);
-        newRada.push(mistnost);
       }
+      newRada.push(mistnost);
     });
     newSvet.push(newRada);
   });
@@ -301,49 +299,33 @@ function drawMap(x, y, playerX, playerY, world) {
     item.forEach(function(item2, index2) {
       if (item2 === 0) {
           Context.context.fillStyle = 'pink';
-          Context.context.fillRect(xova, yova, 15, 15);
-          xova += 15;
       }
       else if (item2 === 1) {
           Context.context.fillStyle = 'yellow';
-          Context.context.fillRect(xova, yova, 15, 15);
-          xova += 15;
       }
       else if (item2 === 2 || item2 === 10) {
           Context.context.fillStyle = 'grey';
-          Context.context.fillRect(xova, yova, 15, 15);
-          xova += 15;
       }
       else if (item2 === 3) {
           Context.context.fillStyle = 'gold';
-          Context.context.fillRect(xova, yova, 15, 15);
-          xova += 15;
       }
       else if (item2 === 4) {
           Context.context.fillStyle = 'silver';
-          Context.context.fillRect(xova, yova, 15, 15);
-          xova += 15;
       }
       else if (item2 === 5) {
           Context.context.fillStyle = 'red';
-          Context.context.fillRect(xova, yova, 15, 15);
-          xova += 15;
       }
       else if (item2 === 6) {
           Context.context.fillStyle = 'black';
-          Context.context.fillRect(xova, yova, 15, 15);
-          xova += 15;
       }
       else if (item2 === 7) {
           Context.context.fillStyle = 'orange';
-          Context.context.fillRect(xova, yova, 15, 15);
-          xova += 15;
       }
       else if (item2 === 8) {
           Context.context.fillStyle = 'green';
-          Context.context.fillRect(xova, yova, 15, 15);
-          xova += 15;
       }
+      Context.context.fillRect(xova, yova, 15, 15);
+      xova += 15;
     });
     xova = Xpuv;
     yova += 15;
@@ -711,6 +693,7 @@ class roomEnemy extends mapTile {
         Context.context.shadowBlur = 5;
         Context.context.shadowColor = 'black';
         Context.context.fillText("YOU DIED", player.platno.width/2+1, player.platno.height/2+1);
+        setCookie("seed", window.seed.toString(), 30);
         document.getElementById("combathudba").pause();
         $('#playagain').css('display', 'inline-block');
         document.getElementById("defeathudba").play();

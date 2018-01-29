@@ -83,23 +83,6 @@
     <script type="text/javascript" src="inc/js/world.js"></script>
     <script type="text/javascript">
 
-      /*
-      //zvuky ve hre
-      var sounds = {
-        88 : 'audio'
-      }
-      document.onkeydown = function(e) {
-        var audio = sounds[e.keyCode];
-        var hudba = document.getElementById(audio);
-        hudba.volume = 0.5;
-        if (audio) hudba.play();
-      }
-      document.onkeyup = function(e) {
-        var audio = sounds[e.keyCode];
-        if (audio) document.getElementById(audio).pause();
-      }
-      */
-
       //nastaveni hlasitosti hudby
       var uvodnihudba = document.getElementById("uvodnihudba");
       uvodnihudba.volume = 0.15;
@@ -112,7 +95,7 @@
       var defeathudba = document.getElementById("defeathudba");
       defeathudba.volume = 0.35;
 
-      // funkce pro inicializi canvas elementu
+      //funkce pro inicializi canvas elementu
       var Context = {
         canvas : null,
         context : null,
@@ -123,7 +106,7 @@
         }
       };
 
-      // funkce pro psani textu do bloku
+      //funkce pro psani textu do bloku
       function wrapText(context, text, x, y, maxWidth, lineHeight) {
         var words = text.split(' ');
         var line = '';
@@ -144,7 +127,7 @@
         context.fillText(line, x, y);
       }
 
-      // funkce pro formatovani textu, jednodussi dosazeni promennych do textu
+      //funkce pro formatovani textu, jednodussi dosazeni promennych do textu
       if (!String.prototype.format) {
         String.prototype.format = function() {
           var args = arguments;
@@ -155,6 +138,28 @@
             ;
           });
         };
+      }
+
+      //funkce pro ovladani cookies (set and get)
+      function setCookie(cname, cvalue, exdays) {
+        var d = new Date();
+        d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+        var expires = "expires="+d.toUTCString();
+        document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+      }
+      function getCookie(cname) {
+        var name = cname + "=";
+        var ca = document.cookie.split(';');
+        for(var i = 0; i < ca.length; i++) {
+          var c = ca[i];
+          while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+          }
+          if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+          }
+        }
+        return "";
       }
 
       //funkce pro novou hru, spoustena pres button po konci hry
@@ -168,7 +173,7 @@
           this.name = name;
           this.inventory = [new Rock(), new Gold(5)];
           this.money = 0;
-          this.hp = 100;
+          this.hp = 1;
           this.locationX = startingPositionX;
           this.locationY = startingPositionY;
           this.inCombat = false;
@@ -288,6 +293,7 @@
               Context.context.shadowBlur = 5;
               Context.context.shadowColor = 'black';
               Context.context.fillText("VICTORY", this.platno.width/2+1, this.platno.height/2+1);
+              document.cookie = "seed=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
               document.getElementById("pozadihudba").pause();
               $('#playagain').css('display', 'inline-block');
               document.getElementById("victoryhudba").play();
@@ -304,6 +310,7 @@
             Context.context.shadowBlur = 5;
             Context.context.shadowColor = 'black';
             Context.context.fillText("YOU DIED", this.platno.width/2+1, this.platno.height/2+1);
+            setCookie("seed", window.seed.toString(), 30);
             document.getElementById("combathudba").pause();
             $('#playagain').css('display', 'inline-block');
             document.getElementById("defeathudba").play();
