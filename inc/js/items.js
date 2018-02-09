@@ -30,6 +30,27 @@ class Key extends Item {
   }
 }
 
+class SmallSpider extends Item {
+  constructor() {
+    super("Small spider", "A small spider, child of a deadly creature.", 50);
+    this.image = document.getElementById("smallspider");
+  }
+}
+
+class Saphir extends Item {
+  constructor() {
+    super("Saphir amulet", "An amulet made from saphir.", 60);
+    this.image = document.getElementById("saphir");
+  }
+}
+
+class Hammer extends Item {
+  constructor() {
+    super("Hammer", "A hammer which looks like the Thor's one. Should be enough to break the wall.", 70);
+    this.image = document.getElementById("hammer");
+  }
+}
+
 class Weapon extends Item {
   constructor(name, description, value, damagemin, damagemax) {
     super(name, description, value);
@@ -47,7 +68,14 @@ class Rock extends Weapon {
 
 class Dagger extends Weapon {
   constructor() {
-    super("Dagger", "A small dagger with some rust. Somewhat more dangerous than a rock.", 11, 7, 11);
+    super("Dagger", "A small dagger with some rust. Somewhat more dangerous than a rock.", 15, 6, 9);
     this.image = document.getElementById("dagger")
+  }
+}
+
+class Sword extends Weapon {
+  constructor() {
+    super("Sword", "A sharp looking sword. This weapon is good for some knight things.", 25, 10, 13);
+    this.image = document.getElementById("sword")
   }
 }

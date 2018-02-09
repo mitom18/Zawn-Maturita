@@ -2,7 +2,7 @@
 var startingPositionX;
 var startingPositionY;
 var level = 1;
-var levelMax = 2;
+var levelMax = 4;
 
 function generateWorld(width, height, uroven) {
   //funkce vygeneruje mapu sveta na zaklade podminek, ale nahodne podle seedu (mapu lze reprodukovat)
@@ -32,146 +32,213 @@ function generateWorld(width, height, uroven) {
     svet.push(rada);
   }
 
-  if (uroven == 1 || uroven == 2) {
-    //urceni startu a cile a cesty do cile, kde nebudou zdi
-    if (Math.random() < 0.5) {
-      svet[0][0] = 0;
-      startingPositionX = 0;
-      startingPositionY = 0;
-      svet[height-1][width-1] = 1;
+  //urceni startu a cile a cesty do cile, kde nebudou zdi
+  if (Math.random() < 0.5) {
+    svet[0][0] = 0;
+    startingPositionX = 0;
+    startingPositionY = 0;
+    svet[height-1][width-1] = 1;
 
-      var x = 0;
-      var y = 0;
-      for (var i = 0; i < width-1; i++) {
-        if (Math.random() < 0.5) {
-          if (x < width-1) x++;
-          if (svet[y][x] === 2) svet[y][x] = 10;
-        } else {
-          if (y < height-1) y++;
+    var x = 0;
+    var y = 0;
+    for (var i = 0; i < width-1; i++) {
+      if (Math.random() < 0.5) {
+        if (x < width-1) x++;
+        if (svet[y][x] === 2) svet[y][x] = 10;
+      } else {
+        if (y < height-1) y++;
+        if (svet[y][x] === 2) svet[y][x] = 10;
+        i--;
+      }
+
+      if (x == width-1 && y != height-1) {
+        while (y != height-1) {
+          y++;
           if (svet[y][x] === 2) svet[y][x] = 10;
           i--;
-        }
-
-        if (x == width-1 && y != height-1) {
-          while (y != height-1) {
-            y++;
-            if (svet[y][x] === 2) svet[y][x] = 10;
-            i--;
-          }
-        }
-        else if (x != width-1 && y == height-1) {
-          while (x != width-1) {
-            x++;
-            if (svet[y][x] === 2) svet[y][x] = 10;
-            i--;
-          }
         }
       }
-    } else {
-      svet[height-1][0] = 0;
-      startingPositionX = 0;
-      startingPositionY = height-1;
-      svet[0][width-1] = 1;
-
-      var x = 0;
-      var y = height - 1;
-      for (var i = 0; i < width-1; i++) {
-        if (Math.random() < 0.5) {
-          if (x < width-1) x++;
-          if (svet[y][x] === 2) svet[y][x] = 10;
-        } else {
-          if (y > 0) y--;
+      else if (x != width-1 && y == height-1) {
+        while (x != width-1) {
+          x++;
           if (svet[y][x] === 2) svet[y][x] = 10;
           i--;
-        }
-
-        if (x == width-1 && y != 0) {
-          while (y != 0) {
-            y--;
-            if (svet[y][x] === 2) svet[y][x] = 10;
-            i--;
-          }
-        }
-        else if (x != width-1 && y == 0) {
-          while (x != width-1) {
-            x++;
-            if (svet[y][x] === 2) svet[y][x] = 10;
-            i--;
-          }
         }
       }
     }
-    //urceni zdi
-    var zdi = Math.floor(width * height / 3.5);
-    if (Math.random() < 0.5) {
-      var xova = Math.floor(Math.random() * (width - 1 - 0 + 1)) + 0;
-      var yova = 0;
-      for (var i = 0; i < zdi; i++) {
-        if (svet[yova][xova] == 2) {
-          svet[yova][xova] = 6;
-        } else {
+  } else {
+    svet[height-1][0] = 0;
+    startingPositionX = 0;
+    startingPositionY = height-1;
+    svet[0][width-1] = 1;
+
+    var x = 0;
+    var y = height - 1;
+    for (var i = 0; i < width-1; i++) {
+      if (Math.random() < 0.5) {
+        if (x < width-1) x++;
+        if (svet[y][x] === 2) svet[y][x] = 10;
+      } else {
+        if (y > 0) y--;
+        if (svet[y][x] === 2) svet[y][x] = 10;
+        i--;
+      }
+
+      if (x == width-1 && y != 0) {
+        while (y != 0) {
+          y--;
+          if (svet[y][x] === 2) svet[y][x] = 10;
           i--;
         }
-        yova++;
-        if (yova > height-1) {
-          yova = 0;
-          var xxx = xova;
+      }
+      else if (x != width-1 && y == 0) {
+        while (x != width-1) {
+          x++;
+          if (svet[y][x] === 2) svet[y][x] = 10;
+          i--;
+        }
+      }
+    }
+  }
+  //urceni zdi
+  var zdi = Math.floor(width * height / 3);
+  var navrzeneZdi = 0;
+  var boolZdi = false;
+  if (Math.random() < 0.5) {
+    var xova = Math.floor(Math.random() * (width - 1 - 0 + 1)) + 0;
+    var yova = 0;
+    for (var i = 0; i < zdi; i++) {
+      if (svet[yova][xova] == 2) {
+        svet[yova][xova] = 6;
+      } else {
+        i--;
+      }
+      yova++;
+      if (yova > height-1) {
+        yova = 0;
+        var xxx = xova;
+        if (zdi - navrzeneZdi < height) {
+          if (boolZdi) {
+            i = zdi+10;
+          } else {
+            boolZdi = true;
+            var count = 0;
+            while (xxx == xova || xxx-1 == xova || xxx+1 == xova || xova == 0 || xova == width-1) {
+              var xova = Math.floor(Math.random() * (width - 1 - 0 + 1)) + 0;
+              count++;
+              if (count > 100000) {
+                i = zdi+10;
+                break;
+              }
+            }
+          }
+        } else {
           while (xxx == xova) {
             var xova = Math.floor(Math.random() * (width - 1 - 0 + 1)) + 0;
           }
         }
       }
-    } else {
-      var yova = Math.floor(Math.random() * (height - 1 - 0 + 1)) + 0;
-      var xova = 0;
-      for (var i = 0; i < zdi; i++) {
-        if (svet[yova][xova] == 2) {
-          svet[yova][xova] = 6;
+      navrzeneZdi = i+1;
+    }
+  } else {
+    var yova = Math.floor(Math.random() * (height - 1 - 0 + 1)) + 0;
+    var xova = 0;
+    for (var i = 0; i < zdi; i++) {
+      if (svet[yova][xova] == 2) {
+        svet[yova][xova] = 6;
+      } else {
+        i--;
+      }
+      xova++;
+      if (xova > width-1) {
+        xova = 0;
+        var yyy = yova;
+        if (zdi - navrzeneZdi < width) {
+          if (boolZdi) {
+            i = zdi+10;
+          } else {
+            boolZdi = true;
+            var count = 0;
+            while (yyy == yova || yyy-1 == yova || yyy+1 == yova || yova == 0 || yova == height-1) {
+              var yova = Math.floor(Math.random() * (height - 1 - 0 + 1)) + 0;
+              count++;
+              if (count > 100000) {
+                i = zdi+10;
+                break;
+              }
+            }
+          }
         } else {
-          i--;
-        }
-        xova++;
-        if (xova > width-1) {
-          xova = 0;
-          var yyy = yova;
           while (yyy == yova) {
             var yova = Math.floor(Math.random() * (height - 1 - 0 + 1)) + 0;
           }
         }
       }
+      navrzeneZdi = i+1;
     }
-    /*starsi verze generovani zdi
-    var zdi = Math.floor(width * height / 5);
-    if (Math.random() < 0.5) {
-      for (var i = 0; i < zdi; i++) {
-        var xova = Math.floor(Math.random() * (width - 1 - 0 + 1)) + 0;
-        if (i < height-1) {
-          if (svet[i][xova] == 2) {
-            svet[i][xova] = 6;
-            i--;
-            continue;
-          }
-        } else {
-          if (svet[height-1][xova] == 2) svet[height-1][xova] = 6;
+  }
+  /*starsi verze generovani zdi
+  var zdi = Math.floor(width * height / 5);
+  if (Math.random() < 0.5) {
+    for (var i = 0; i < zdi; i++) {
+      var xova = Math.floor(Math.random() * (width - 1 - 0 + 1)) + 0;
+      if (i < height-1) {
+        if (svet[i][xova] == 2) {
+          svet[i][xova] = 6;
+          i--;
+          continue;
         }
+      } else {
+        if (svet[height-1][xova] == 2) svet[height-1][xova] = 6;
       }
-    } else {
-      for (var i = 0; i < zdi; i++) {
-        var yova = Math.floor(Math.random() * (height - 1 - 0 + 1)) + 0;
-        if (i < width-1) {
-          if (svet[yova][i] == 2) {
-            svet[yova][i] = 6;
-            i--;
-            continue;
-          }
-        } else {
-          if (svet[yova][width-1] == 2) svet[yova][width-1] = 6;
+    }
+  } else {
+    for (var i = 0; i < zdi; i++) {
+      var yova = Math.floor(Math.random() * (height - 1 - 0 + 1)) + 0;
+      if (i < width-1) {
+        if (svet[yova][i] == 2) {
+          svet[yova][i] = 6;
+          i--;
+          continue;
         }
+      } else {
+        if (svet[yova][width-1] == 2) svet[yova][width-1] = 6;
       }
-    }*/
+    }
+  }*/
 
-    //urceni dalsich mistnosti podle urovni
-    if (uroven == 1) {
+  //urceni dalsich mistnosti podle urovni
+  if (uroven == 1) {
+    while (true) {
+      var randomX = Math.floor(Math.random() * (width - 1 - 0 + 1)) + 0;
+      var randomY = Math.floor(Math.random() * (height - 1 - 0 + 1)) + 0;
+      if (svet[randomY][randomX] == 2) {
+        svet[randomY][randomX] = 9;
+        break;
+      }
+    }
+    for (var i = 0; i < 3; i++) {
+      while (true) {
+        var randomX = Math.floor(Math.random() * (width - 1 - 0 + 1)) + 0;
+        var randomY = Math.floor(Math.random() * (height - 1 - 0 + 1)) + 0;
+        if (svet[randomY][randomX] == 2) {
+          svet[randomY][randomX] = 4;
+          break;
+        }
+      }
+    }
+    while (true) {
+      var randomX = Math.floor(Math.random() * (width - 1 - 0 + 1)) + 0;
+      var randomY = Math.floor(Math.random() * (height - 1 - 0 + 1)) + 0;
+      if (svet[randomY][randomX] == 2) {
+        svet[randomY][randomX] = 3;
+        break;
+      }
+    }
+
+  }
+  else if (uroven == 2) {
+    for (var i = 0; i < 2; i++) {
       while (true) {
         var randomX = Math.floor(Math.random() * (width - 1 - 0 + 1)) + 0;
         var randomY = Math.floor(Math.random() * (height - 1 - 0 + 1)) + 0;
@@ -180,52 +247,71 @@ function generateWorld(width, height, uroven) {
           break;
         }
       }
-      for (var i = 0; i < 3; i++) {
-        while (true) {
-          var randomX = Math.floor(Math.random() * (width - 1 - 0 + 1)) + 0;
-          var randomY = Math.floor(Math.random() * (height - 1 - 0 + 1)) + 0;
-          if (svet[randomY][randomX] == 2) {
-            svet[randomY][randomX] = 4;
-            break;
-          }
-        }
-      }
+    }
+    for (var i = 0; i < 4; i++) {
       while (true) {
         var randomX = Math.floor(Math.random() * (width - 1 - 0 + 1)) + 0;
         var randomY = Math.floor(Math.random() * (height - 1 - 0 + 1)) + 0;
         if (svet[randomY][randomX] == 2) {
-          svet[randomY][randomX] = 3;
+          svet[randomY][randomX] = 4;
           break;
         }
       }
-
     }
-    else if (uroven == 2) {
-      for (var i = 0; i < 2; i++) {
-        while (true) {
-          var randomX = Math.floor(Math.random() * (width - 1 - 0 + 1)) + 0;
-          var randomY = Math.floor(Math.random() * (height - 1 - 0 + 1)) + 0;
-          if (svet[randomY][randomX] == 2) {
-            svet[randomY][randomX] = 5;
-            break;
-          }
-        }
+    while (true) {
+      var randomX = Math.floor(Math.random() * (width - 1 - 0 + 1)) + 0;
+      var randomY = Math.floor(Math.random() * (height - 1 - 0 + 1)) + 0;
+      if (svet[randomY][randomX] == 2) {
+        svet[randomY][randomX] = 8;
+        break;
       }
-      for (var i = 0; i < 4; i++) {
-        while (true) {
-          var randomX = Math.floor(Math.random() * (width - 1 - 0 + 1)) + 0;
-          var randomY = Math.floor(Math.random() * (height - 1 - 0 + 1)) + 0;
-          if (svet[randomY][randomX] == 2) {
-            svet[randomY][randomX] = 4;
-            break;
-          }
-        }
+    }
+  }
+  else if (uroven == 3) {
+    while (true) {
+      var randomX = Math.floor(Math.random() * (width - 1 - 0 + 1)) + 0;
+      var randomY = Math.floor(Math.random() * (height - 1 - 0 + 1)) + 0;
+      if (svet[randomY][randomX] == 2) {
+        svet[randomY][randomX] = 7;
+        break;
       }
+    }
+    for (var i = 0; i < 4; i++) {
       while (true) {
         var randomX = Math.floor(Math.random() * (width - 1 - 0 + 1)) + 0;
         var randomY = Math.floor(Math.random() * (height - 1 - 0 + 1)) + 0;
         if (svet[randomY][randomX] == 2) {
-          svet[randomY][randomX] = 8;
+          svet[randomY][randomX] = 4;
+          break;
+        }
+      }
+    }
+    for (var i = 0; i < 2; i++) {
+      while (true) {
+        var randomX = Math.floor(Math.random() * (width - 1 - 0 + 1)) + 0;
+        var randomY = Math.floor(Math.random() * (height - 1 - 0 + 1)) + 0;
+        if (svet[randomY][randomX] == 2) {
+          svet[randomY][randomX] = 12;
+          break;
+        }
+      }
+    }
+  }
+  else if (uroven == 4) {
+    while (true) {
+      var randomX = Math.floor(Math.random() * (width - 1 - 0 + 1)) + 0;
+      var randomY = Math.floor(Math.random() * (height - 1 - 0 + 1)) + 0;
+      if (svet[randomY][randomX] == 2) {
+        svet[randomY][randomX] = 11;
+        break;
+      }
+    }
+    for (var i = 0; i < 4; i++) {
+      while (true) {
+        var randomX = Math.floor(Math.random() * (width - 1 - 0 + 1)) + 0;
+        var randomY = Math.floor(Math.random() * (height - 1 - 0 + 1)) + 0;
+        if (svet[randomY][randomX] == 2) {
+          svet[randomY][randomX] = 4;
           break;
         }
       }
@@ -274,10 +360,19 @@ function describeWorld(svet) {
         var mistnost = new Wall(index2, index);
       }
       else if (item2 === 7) {
-        var mistnost = new roomLootDagger(index2, index);
+        var mistnost = new roomLootHammer(index2, index);
       }
       else if (item2 === 8) {
         var mistnost = new roomMerchant(index2, index);
+      }
+      else if (item2 === 9) {
+        var mistnost = new roomEnemySpider(index2, index);
+      }
+      else if (item2 === 11) {
+        var mistnost = new roomEnemyMinotaur(index2, index);
+      }
+      else if (item2 === 12) {
+        var mistnost = new roomEnemyGoblin(index2, index);
       }
       newRada.push(mistnost);
     });
@@ -289,7 +384,7 @@ function describeWorld(svet) {
 function drawMap(x, y, playerX, playerY, world) {
   //funkce vykresluje grafickou mapku na zaklade cisel v puvodni mapce
   Context.context.save();
-  Context.context.clearRect(x, y-30, world.length*15, world[0].length*15+30);
+  Context.context.clearRect(x, y-30, world[0].length*15, world.length*15+30);
   Context.context.fillText("Map:", x, y-15);
   var Xpuv = x;
   var Ypuv = y;
@@ -312,7 +407,7 @@ function drawMap(x, y, playerX, playerY, world) {
       else if (item2 === 4) {
           Context.context.fillStyle = 'silver';
       }
-      else if (item2 === 5) {
+      else if (item2 === 5 || item2 === 9 || item2 === 11 || item2 == 12) {
           Context.context.fillStyle = 'red';
       }
       else if (item2 === 6) {
@@ -400,44 +495,118 @@ class emptyPath extends mapTile {
 }
 
 class roomFinal {
-  intro_text(player) {
-    this.klic = false;
+  check_item(player, checkedItem, amount) {
+    var inInventory = false;
+    var counter = 0;
     for (var item of player.inventory) {
-      if (item instanceof Key) {
-        this.image = document.getElementById("exit");
-        this.text = "The key matches and you unlock the door! You are free, you made it!";
-        this.klic = true;
-        break;
-      }
-    };
-    if (!this.klic) {
-      if (level == levelMax) {
-        this.image = document.getElementById("exit");
-        this.text = "You have to find a key to unlock the exit door.";
-      } else {
-        this.image = document.getElementById("cage");
-        this.text = "You have to find a key to continue your journey.";
+      if (item instanceof checkedItem) {
+        counter++;
+        if (counter == amount) {
+          inInventory = true;
+          break;
+        }
       }
     }
-    Context.context.drawImage(this.image, 75, 30, 250, 250);
-    wrapText(Context.context, this.text, 15, 330, 400, 25);
+    return inInventory;
   }
+
+  intro_text(player, intro, postup) {
+    if (intro == undefined || postup == undefined) {
+      return null;
+    } else {
+      if (intro == 1) {
+        this.image = document.getElementById("finalgnome");
+        if (postup) {
+          this.text = "What a cute spider! Thank you!";
+        } else {
+          this.text = "Stop! Bring me a small spider and I will let you get through.";
+        }
+      }
+      else if (intro == 2) {
+        this.image = document.getElementById("finalguard");
+        if (postup) {
+          this.text = "Nice work, you can go on now.";
+        } else {
+          this.text = "Stop! I won't let you continue until you give me 2 saphir amulets.";
+        }
+      }
+      else if (intro == 3) {
+        this.image = document.getElementById("wall");
+        if (postup) {
+          this.text = "One punch and the wall breaks apart. You can continue.";
+        } else {
+          this.text = "The wall seems weak. With a good tool you should be able to break through.";
+        }
+      }
+      else if (intro == 4) {
+        this.image = document.getElementById("exit");
+        if (postup) {
+          this.text = "The key matches and you unlock the door! You are free, you made it!";
+        } else {
+          this.text = "The door is locked. You have to find a key to go on.";
+        }
+      }
+      Context.context.drawImage(this.image, 80, 50, 250, 250);
+      wrapText(Context.context, this.text, 15, 330, 400, 25);
+    }
+  }
+
   modify_player(player) {
     player.inCombat = false;
     document.getElementById("combathudba").pause();
     document.getElementById("combathudba").currentTime = 0;
     document.getElementById("pozadihudba").play();
-    if (this.klic) {
+    if (level == levelMax) {
+      var checkedItem = Key;
+      var amount = 1;
+      var intro = 4;
+    }
+    else if (level == 1) {
+      var checkedItem = SmallSpider;
+      var amount = 1;
+      var intro = 1;
+    }
+    else if (level == 2) {
+      var checkedItem = Saphir;
+      var amount = 2;
+      var intro = 2;
+    }
+    else if (level == 3) {
+      var checkedItem = Hammer;
+      var amount = 1;
+      var intro = 3;
+    }
+    if (this.check_item(player, checkedItem, amount)) {
+      this.intro_text(player, intro, true);
       if (level == levelMax) {
         player.victory = true;
       } else {
         level += 1;
-        _world = generateWorld(10, 5, level); //generace noveho levelu
-        player.inventory.forEach(function(item, index) {
-          if (item instanceof Key) {
-            player.inventory.splice(index, 1);
-          }
-        });
+        var deleteQuestItems = checkedItem;
+
+        if (level == 2) {
+          var newLevelWidth = 10;
+          var newLevelHeight = 5;
+        }
+        else if (level == 3) {
+          var newLevelWidth = 11;
+          var newLevelHeight = 6;
+        }
+        else if (level == 4) {
+          var newLevelWidth = 12;
+          var newLevelHeight = 7;
+        }
+
+        _world = generateWorld(newLevelWidth, newLevelHeight, level); //generace noveho levelu
+        do {
+          player.inventory.forEach(function(item, index) {
+            if (item instanceof deleteQuestItems) {
+              player.inventory.splice(index, 1);
+            }
+          });
+          amount--;
+        }
+        while (amount > 0);
         player.locationX = startingPositionX;
         player.locationY = startingPositionY;
         window.described_world = describeWorld(_world); //inicializace noveho levelu
@@ -445,6 +614,8 @@ class roomFinal {
         Context.context.clearRect(0, 0, player.platno.width/2+10, player.platno.height);
         novaAktualniMistnost.intro_text();
       }
+    } else {
+      this.intro_text(player, intro, false);
     }
   }
 }
@@ -453,11 +624,12 @@ class roomMerchant extends mapTile {
   //mistnost s obchodnikem
   constructor(x, y) {
     super(x, y);
-    this.inventory = [new Dagger(), new LifePotion(10), new Dagger(), new LifePotion(10)];
+    this.inventory = [new Dagger(), new LifePotion(10), new Dagger(), new LifePotion(10), new Sword()];
     this.invIndex = 0;
     this.aktualniItem = this.inventory[this.invIndex];
   }
   choosingItem(smer) {
+    //prochazeni nabidky obchodnika
     if (smer) {
       this.invIndex++;
       if (this.invIndex > this.inventory.length-1) this.invIndex = 0;
@@ -468,6 +640,7 @@ class roomMerchant extends mapTile {
     this.aktualniItem = this.inventory[this.invIndex];
   }
   buyItem(player) {
+    //hrac kupuje item
     var counter = 0;
     for (var item of this.inventory) {
       if (item.constructor.name === this.aktualniItem.constructor.name) counter++;
@@ -491,6 +664,7 @@ class roomMerchant extends mapTile {
     wrapText(Context.context, this.text, 15, 330, 400, 25);
   }
   sellItem(player) {
+    //hrac prodava item
     this.haveItem = false;
     var i = 0;
     for (var item of player.inventory) {
@@ -513,6 +687,7 @@ class roomMerchant extends mapTile {
     wrapText(Context.context, this.text, 15, 330, 400, 25);
   }
   printInventory(x, y) {
+    //funkce kresli inventar obchodnika
     Context.context.save();
     Context.context.clearRect(x, y, 330, 50);
     var xova = x;
@@ -533,7 +708,7 @@ class roomMerchant extends mapTile {
     };
     var inv = this.inventory.sort(compare);
     //vykresli inventar do 1 rady po 10 itemech, stejne itemy se nestackuji
-    for (var j = 0; j < 7; j++) {
+    for (var j = 0; j < 10; j++) {
       if (inv[polozka]) {
         if (this.aktualniItem == inv[polozka]) {
           Context.context.drawImage(inv[polozka].image, xova, yova, 40, 40);
@@ -587,7 +762,7 @@ class roomLoot extends mapTile {
       Context.context.clearRect(0, 0, player.platno.width/2+10, player.platno.height);
       Context.context.drawImage(document.getElementById("lootopened"), 80, 50, 250, 250);
       Context.context.drawImage(this.item.image, 175, 180, 30, 30);
-      wrapText(Context.context, "You found a {0}!".format(this.item.name), 15, 330, 400, 25);
+      wrapText(Context.context, "You found something! {0}".format(this.item.description), 15, 330, 400, 25);
     }
     this.taken = true;
   }
@@ -601,14 +776,27 @@ class roomLoot extends mapTile {
 
 class roomLootRandom extends roomLoot {
   constructor(x, y) {
-    if (Math.random() < 0.3) {
-      var item = new LifePotion(10);
+    if (level == 3 || level == 4) {
+      var propDagger = 0.05;
+      var propSword = 0.10;
+      var propPotion = 0.45;
+    } else {
+      var propDagger = 0.05;
+      var propSword = 0;
+      var propPotion = 0.35;
     }
-    else if (Math.random() < 0.6) {
-      var item = new Gold(10);
+
+    if (Math.random() < propDagger) {
+      var item = new Dagger();
+    }
+    else if (Math.random() < propSword) {
+      var item = new Sword();
+    }
+    else if (Math.random() < propPotion) {
+      var item = new LifePotion(5);
     }
     else {
-      var item = new Dagger();
+      var item = new Gold(5);
     }
     super(x, y, item);
   }
@@ -642,9 +830,9 @@ class roomLootGold extends roomLoot {
   }
 }
 
-class roomLootDagger extends roomLoot {
+class roomLootHammer extends roomLoot {
   constructor(x, y) {
-    super(x, y, new Dagger());
+    super(x, y, new Hammer());
   }
   intro_text() {
     if (!this.taken) {
@@ -682,6 +870,8 @@ class roomEnemy extends mapTile {
         wrapText(Context.context, "{0} does {1} damage. You have {2} HP remaining.".format(this.enemy.name, damage, player.hp), 15, 390, 400, 25);
       } else {
         player.printInventory(480, 315);
+        Context.context.clearRect(15, 400, 320, 320);
+        wrapText(Context.context, "{0} does {1} damage. You are dead.".format(this.enemy.name, damage), 15, 390, 400, 25);
         Context.context.fillStyle = 'white';
         Context.context.globalAlpha = 0.2;
         Context.context.fillRect(0, 0, player.platno.width, player.platno.height);
@@ -716,6 +906,57 @@ class roomEnemyOgre extends roomEnemy {
     } else {
       this.image = document.getElementById("enemydead");
       this.text = "The corpse of a dead ogre lies on the ground.";
+    }
+    Context.context.drawImage(this.image, 80, 50, 250, 250);
+    wrapText(Context.context, this.text, 15, 330, 400, 25);
+  }
+}
+
+class roomEnemySpider extends roomEnemy {
+  constructor(x, y) {
+    super(x, y, new Spider());
+  }
+  intro_text() {
+    if (this.enemy.isAlive()) {
+      this.image = document.getElementById("spider");
+      this.text = "A giant spider is approaching! You can attack it by pressing D or flee by pressing F.";
+    } else {
+      this.image = document.getElementById("enemydead");
+      this.text = "The corpse of a dead spider lies on the ground.";
+    }
+    Context.context.drawImage(this.image, 80, 50, 250, 250);
+    wrapText(Context.context, this.text, 15, 330, 400, 25);
+  }
+}
+
+class roomEnemyGoblin extends roomEnemy {
+  constructor(x, y) {
+    super(x, y, new Goblin());
+  }
+  intro_text() {
+    if (this.enemy.isAlive()) {
+      this.image = document.getElementById("goblin");
+      this.text = "A currish goblin is trying to rob you! You can attack it by pressing D or flee by pressing F.";
+    } else {
+      this.image = document.getElementById("enemydead");
+      this.text = "The corpse of a dead goblin lies on the ground.";
+    }
+    Context.context.drawImage(this.image, 80, 50, 250, 250);
+    wrapText(Context.context, this.text, 15, 330, 400, 25);
+  }
+}
+
+class roomEnemyMinotaur extends roomEnemy {
+  constructor(x, y) {
+    super(x, y, new Minotaur());
+  }
+  intro_text() {
+    if (this.enemy.isAlive()) {
+      this.image = document.getElementById("minotaur");
+      this.text = "A frightening minotaur is approaching and everything trembles! You can attack it by pressing D or flee by pressing F.";
+    } else {
+      this.image = document.getElementById("enemydead");
+      this.text = "The corpse of a dead minotaur lies on the ground.";
     }
     Context.context.drawImage(this.image, 80, 50, 250, 250);
     wrapText(Context.context, this.text, 15, 330, 400, 25);

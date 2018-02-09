@@ -61,8 +61,12 @@
       <img id="path" src="img/path.png" width="512px" height="512px">
       <img id="exit" src="img/dungeon-light.png" width="512px" height="512px">
       <img id="cage" src="img/cage.png" width="512px" height="512px">
+      <img id="wall" src="img/wall.png" width="512px" height="512px">
       <img id="gold" src="img/gold.png" width="512px" height="512px">
       <img id="ogre" src="img/ogreroom.png" width="512px" height="512px">
+      <img id="spider" src="img/spiderroom.png" width="512px" height="512px">
+      <img id="goblin" src="img/goblinroom.png" width="512px" height="512px">
+      <img id="minotaur" src="img/minotaurroom.png" width="512px" height="512px">
       <img id="enemydead" src="img/enemydead.png" width="512px" height="512px">
       <img id="lootclosed" src="img/lootclosed.png" width="512px" height="512px">
       <img id="lootopened" src="img/lootopened.png" width="512px" height="512px">
@@ -70,10 +74,16 @@
       <img id="life" src="img/heart.png" width="512px" height="512px">
       <img id="lifepotion" src="img/heart-bottle.png" width="512px" height="512px">
       <img id="key" src="img/skeleton-key.png" width="512px" height="512px">
+      <img id="saphir" src="img/saphir.png" width="512px" height="512px">
+      <img id="smallspider" src="img/smallspider.png" width="512px" height="512px">
+      <img id="hammer" src="img/thor-hammer.png" width="512px" height="512px">
       <img id="dagger" src="img/plain-dagger.png" width="512px" height="512px">
+      <img id="sword" src="img/broadsword.png" width="512px" height="512px">
       <img id="rock" src="img/rock.png" width="512px" height="512px">
       <img id="daggerLoot" src="img/dagger.png" width="512px" height="512px">
       <img id="merchant" src="img/merchant.png" width="512px" height="512px">
+      <img id="finalgnome" src="img/finalgnome.png" width="512px" height="512px">
+      <img id="finalguard" src="img/finalguard.png" width="512px" height="512px">
     </div>
 
     <script type="text/javascript" src="inc/js/jquery-3.2.1.min.js"></script>
@@ -82,6 +92,7 @@
     <script type="text/javascript" src="inc/js/enemies.js"></script>
     <script type="text/javascript" src="inc/js/world.js"></script>
     <script type="text/javascript">
+      "use strict";
 
       //nastaveni hlasitosti hudby
       var uvodnihudba = document.getElementById("uvodnihudba");
@@ -173,7 +184,7 @@
           this.name = name;
           this.inventory = [new Rock(), new Gold(5)];
           this.money = 0;
-          this.hp = 1;
+          this.hp = 50;
           this.locationX = startingPositionX;
           this.locationY = startingPositionY;
           this.inCombat = false;
@@ -353,8 +364,8 @@
             this.aktualniMistnost.addLoot(this);
             this.printInventory(480, 315);
             Context.context.clearRect(15, 370, 400, 400);
-            wrapText(Context.context, "You killed {0}!".format(this.enemy.name), 15, 360, 400, 25);
-            Context.context.clearRect(0, 0, this.platno.width/2+1, this.platno.height/2+1);
+            wrapText(Context.context, "You killed {0} and looted {1}!".format(this.enemy.name, this.enemy.loot.name), 15, 360, 400, 25);
+            Context.context.clearRect(0, 0, this.platno.width/2+1, this.platno.height/3*2);
             Context.context.drawImage(document.getElementById("enemydead"), 80, 50, 250, 250);
             document.getElementById("combathudba").pause();
             document.getElementById("combathudba").currentTime = 0;
@@ -390,6 +401,7 @@
 
       //funkce spusteni jadra hry
       function gameloop() {
+        "use strict";
         var playername = document.getElementById("playername").value;
         window.seed = document.getElementById("seedinput").value;
         if (!playername) {
@@ -404,8 +416,10 @@
         $('#helpbutton').click(function() {
           var pomoc = $('#help');
           if (pomoc.is(':hidden')) {
+            $('#helpbutton').text("hide");
             pomoc.show('normal');
           } else {
+            $('#helpbutton').text("help");
             pomoc.hide('normal');
           }
         });

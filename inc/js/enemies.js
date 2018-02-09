@@ -13,12 +13,24 @@ class Enemy {
 
 class Ogre extends Enemy {
   constructor() {
-    super("Ogre", 30, 4, 7, new Key());
+    super("Ogre", 30, 4, 7, new Saphir());
+  }
+}
+
+class Goblin extends Enemy {
+  constructor() {
+    super("Goblin", 20, 3, 5, new Gold(10));
   }
 }
 
 class Spider extends Enemy {
   constructor() {
-    super("Spider", 10, 1, 4, new Gold(5));
+    super("Spider", 10, 1, 4, new SmallSpider());
+  }
+}
+
+class Minotaur extends Enemy {
+  constructor() {
+    super("Minotaur", 35, 8, 12, new Key());
   }
 }
