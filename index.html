@@ -31,32 +31,31 @@
       </div>
     </div>
     <div class="keyboard">
-      <button id="west" class="tlacitko" type="button" name="button">w</button>
-      <button id="east" class="tlacitko" type="button" name="button">e</button>
-      <button id="south" class="tlacitko" type="button" name="button">s</button>
-      <button id="north" class="tlacitko" type="button" name="button">n</button>
+      <button id="north" class="tlacitko" type="button" name="button"><img src="img/sipkanahoru.png"></button>
+      <button id="south" class="tlacitko" type="button" name="button"><img src="img/sipkadolu.png"></button>
+      <button id="west" class="tlacitko" type="button" name="button"><img src="img/sipkaleva.png"></button>
+      <button id="east" class="tlacitko" type="button" name="button"><img src="img/sipkaprava.png"></button>
 
-      <button id="attack" class="tlacitko" type="button" name="button">attack</button>
-      <button id="flee" class="tlacitko" type="button" name="button">flee</button>
+      <button id="attack" class="tlacitko" type="button" name="button">attack (d)</button>
+      <button id="flee" class="tlacitko" type="button" name="button">flee (f)</button>
       <button id="helpbutton" class="tlacitko" type="button" name="button">help</button>
-      <button id="escape" class="tlacitko" type="button" name="button">o</button>
+      <button id="escape" class="tlacitko" type="button" name="button">esc</button>
     </div>
 
     <!-- seznam zvuku ve hre -->
     <audio id="audio" src="inc/sound/IronMan3.mp3"></audio>
-    <audio id="uvodnihudba" src="inc/sound/Echinoderm_Regeneration.mp3" autoplay="true" loop="true">
+    <audio id="startmusic" src="inc/sound/Echinoderm_Regeneration.mp3" autoplay="true" loop="true">
       <source src="inc/sound/Echinoderm_Regeneration.mp3" type="audio/">
     </audio>
-    <audio id="combathudba" src="inc/sound/Cataclysmic_Molten_Core.mp3" loop="true"></audio>
-    <audio id="pozadihudba" src="inc/sound/Echoes_of_Time_v2.mp3" loop="true"></audio>
-    <audio id="victoryhudba" src="inc/sound/Discovery_Hit.mp3"></audio>
-    <audio id="defeathudba" src="inc/sound/Greta_Sting.mp3"></audio>
+    <audio id="combatmusic" src="inc/sound/Cataclysmic_Molten_Core.mp3" loop="true"></audio>
+    <audio id="bgmusic" src="inc/sound/Echoes_of_Time_v2.mp3" loop="true"></audio>
+    <audio id="victorymusic" src="inc/sound/Discovery_Hit.mp3"></audio>
+    <audio id="defeatmusic" src="inc/sound/Greta_Sting.mp3"></audio>
 
     <!-- seznam obrazku ve hre -->
     <div style="display: none;">
       <img id="img1" src="img/freedom-dove.png" width="512px" height="512px">
       <img id="torch" src="img/torch.png" width="512px" height="512px">
-      <img id="door" src="img/wooden-door.png" width="512px" height="512px">
       <img id="entrance" src="img/dungeon-gate.png" width="512px" height="512px">
       <img id="path" src="img/path.png" width="512px" height="512px">
       <img id="exit" src="img/dungeon-light.png" width="512px" height="512px">
@@ -95,16 +94,16 @@
       "use strict";
 
       //nastaveni hlasitosti hudby
-      var uvodnihudba = document.getElementById("uvodnihudba");
-      uvodnihudba.volume = 0.15;
-      var combathudba = document.getElementById("combathudba");
-      combathudba.volume = 0.15;
-      var pozadihudba = document.getElementById("pozadihudba");
-      pozadihudba.volume = 0.25;
-      var victoryhudba = document.getElementById("victoryhudba");
-      victoryhudba.volume = 0.35;
-      var defeathudba = document.getElementById("defeathudba");
-      defeathudba.volume = 0.35;
+      var startmusic = document.getElementById("startmusic");
+      startmusic.volume = 0.15;
+      var combatmusic = document.getElementById("combatmusic");
+      combatmusic.volume = 0.15;
+      var bgmusic = document.getElementById("bgmusic");
+      bgmusic.volume = 0.25;
+      var victorymusic = document.getElementById("victorymusic");
+      victorymusic.volume = 0.35;
+      var defeatmusic = document.getElementById("defeatmusic");
+      defeatmusic.volume = 0.35;
 
       //funkce pro inicializi canvas elementu
       var Context = {
@@ -305,9 +304,9 @@
               Context.context.shadowColor = 'black';
               Context.context.fillText("VICTORY", this.platno.width/2+1, this.platno.height/2+1);
               document.cookie = "seed=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
-              document.getElementById("pozadihudba").pause();
+              document.getElementById("bgmusic").pause();
               $('#playagain').css('display', 'inline-block');
-              document.getElementById("victoryhudba").play();
+              document.getElementById("victorymusic").play();
             }
           } else {
             Context.context.fillStyle = 'white';
@@ -322,9 +321,9 @@
             Context.context.shadowColor = 'black';
             Context.context.fillText("YOU DIED", this.platno.width/2+1, this.platno.height/2+1);
             setCookie("seed", window.seed.toString(), 30);
-            document.getElementById("combathudba").pause();
+            document.getElementById("combatmusic").pause();
             $('#playagain').css('display', 'inline-block');
-            document.getElementById("defeathudba").play();
+            document.getElementById("defeatmusic").play();
           }
 
         }
@@ -366,17 +365,17 @@
             Context.context.clearRect(15, 370, 400, 400);
             wrapText(Context.context, "You killed {0} and looted {1}!".format(this.enemy.name, this.enemy.loot.name), 15, 360, 400, 25);
             Context.context.clearRect(0, 0, this.platno.width/2+1, this.platno.height/3*2);
-            Context.context.drawImage(document.getElementById("enemydead"), 80, 50, 250, 250);
-            document.getElementById("combathudba").pause();
-            document.getElementById("combathudba").currentTime = 0;
-            document.getElementById("pozadihudba").play();
+            Context.context.drawImage(document.getElementById("enemydead"), 65, 25, 250, 250);
+            document.getElementById("combatmusic").pause();
+            document.getElementById("combatmusic").currentTime = 0;
+            document.getElementById("bgmusic").play();
           } else {
             Context.context.clearRect(15, 370, 400, 400);
             wrapText(Context.context, "{0} HP is {1}.".format(this.enemy.name, this.enemy.hp), 15, 360, 400, 25);
           }
         }
         flee(world) {
-          //funkce pro utek hrace z combatu, utece do nahodne vybrane sousedni mistnosti
+          //funkce pro utek hrace z combatu, utece do nahodne vybrane sousedni mistnosti, ale nepritel mu ubere zivoty
           while (true) {
             var randomIndex = Math.floor(Math.random() * (3 - 0 + 1)) + 0;
             if (randomIndex == 0 && this.locationX-1 > 0 && !(world[this.locationY][this.locationX-1] instanceof Wall)) {
@@ -396,6 +395,9 @@
               break;
             }
           }
+          var minusHP = Math.floor(Math.random() * (3 - 0 + 1)) + 0;
+          this.hp -= minusHP;
+          this.printInventory(480, 315);
         }
       }
 
@@ -423,12 +425,12 @@
             pomoc.hide('normal');
           }
         });
-        document.getElementById("uvodnihudba").pause();
+        document.getElementById("startmusic").pause();
         $(document).ready(function(){
 
           Context.create("canvas"); //inicializace canvas elementu
 
-          window._world = generateWorld(7, 5, level);
+          window._world = generateWorld(7, 6, level);
           window.described_world = describeWorld(_world); //inicializace sveta
 
           var player = new Player(playername); //inicialize hrace
@@ -468,6 +470,9 @@
             else if (player.isAlive() && !player.victory && player.aktualniMistnost instanceof roomLoot) {
               player.aktualniMistnost.addLoot(player);
             }
+            else if (player.isAlive() && !player.victory && player.aktualniMistnost instanceof roomFinal) {
+              player.aktualniMistnost.toNewLevel(player);
+            }
             else if (player.inShop && player.aktualniMistnost instanceof roomMerchant && player.aktualniMistnost.canTrade) {
               player.aktualniMistnost.buyItem(player);
               player.printInventory(480, 315);
@@ -483,7 +488,14 @@
             }
           };
           document.getElementById("escape").onclick = function(){
-            if (player.inShop && player.aktualniMistnost instanceof roomMerchant) player.inShop = false;
+            if (player.inShop && player.aktualniMistnost instanceof roomMerchant) {
+              player.inShop = false;
+              $('#escape').css('display', 'none');
+              $('#attack').text('attack (d)');
+              $('#flee').text('flee (f)');
+              Context.context.clearRect(15, 305, 400, 320);
+              wrapText(Context.context, "Peace be with you, {0}.".format(player.name), 15, 330, 400, 25);
+            }
           };
 
           //inicialize ovladani pres klavesnici
@@ -520,6 +532,7 @@
                 if (e.keyCode === 68 && !pressEx) {
                   pressEx = true;
                   if (player.aktualniMistnost instanceof roomLoot) player.aktualniMistnost.addLoot(player);
+                  else if (player.aktualniMistnost instanceof roomFinal) player.aktualniMistnost.toNewLevel(player);
                   else if (player.inShop && player.aktualniMistnost instanceof roomMerchant && player.aktualniMistnost.canTrade) {
                     player.aktualniMistnost.buyItem(player);
                     player.printInventory(480, 315);
@@ -534,7 +547,14 @@
                 }
                 if (e.keyCode === 27 && !pressEx) {
                   pressEx = true;
-                  if (player.inShop && player.aktualniMistnost instanceof roomMerchant) player.inShop = false;
+                  if (player.inShop && player.aktualniMistnost instanceof roomMerchant) {
+                    player.inShop = false;
+                    $('#escape').css('display', 'none');
+                    $('#attack').text('attack (d)');
+                    $('#flee').text('flee (f)');
+                    Context.context.clearRect(15, 305, 400, 320);
+                    wrapText(Context.context, "Peace be with you, {0}.".format(player.name), 15, 330, 400, 25);
+                  }
                 }
                 if (e.keyCode === 88) document.getElementById("audio").play();
               } else {
@@ -567,7 +587,7 @@
 
           //vstup do uvodni mistnosti
           var aktualniMistnost = stepInTile(startingPositionX, startingPositionY, described_world);
-          aktualniMistnost.intro_text();
+          aktualniMistnost.intro_text(player);
 
           //uvodni vykresleni mapy
           drawMap(480, 80, player.locationX, player.locationY, _world);
@@ -576,7 +596,7 @@
           player.printInventory(480, 315);
 
           //zacne hrat hudba na pozadi
-          document.getElementById("pozadihudba").play();
+          document.getElementById("bgmusic").play();
 
         });
       }

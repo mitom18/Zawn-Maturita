@@ -68,14 +68,14 @@ class Rock extends Weapon {
 
 class Dagger extends Weapon {
   constructor() {
-    super("Dagger", "A small dagger with some rust. Somewhat more dangerous than a rock.", 15, 6, 9);
+    super("Dagger", "A small dagger with some rust. Somewhat more dangerous than a rock.", 25, 6, 9);
     this.image = document.getElementById("dagger")
   }
 }
 
 class Sword extends Weapon {
   constructor() {
-    super("Sword", "A sharp looking sword. This weapon is good for some knight things.", 25, 10, 13);
+    super("Sword", "A sharp looking sword. This weapon is good for some knight things.", 50, 10, 13);
     this.image = document.getElementById("sword")
   }
 }

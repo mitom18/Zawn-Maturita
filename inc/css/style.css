@@ -182,7 +182,7 @@ h1 {
   position: relative;
   margin-left: auto;
   margin-right: auto;
-  width: 550px;
+  width: 600px;
   margin-top: 30px;
 }
 @media (max-width: 1440px) {
@@ -201,7 +201,7 @@ h1 {
   border: 2px solid gray;
 }
 .keyboard .tlacitko:hover {
-  background-color: #fff;
+  background-color: #848484;
   color: #000;
   cursor: pointer;
 }
@@ -226,25 +226,26 @@ h1 {
   top: 0;
 }
 #attack {
-  position: absolute;
+  position: relative;
   padding: 8px 25px;
-  left: 150px;
+  margin-left: 150px;
   top: 40px;
 }
 #flee {
-  position: absolute;
+  position: relative;
   padding: 8px 25px;
-  left: 280px;
+  margin-left: 10px;
   top: 40px;
 }
 #helpbutton {
-  position: absolute;
+  position: relative;
   padding: 8px 25px;
-  left: 390px;
+  margin-left: 10px;
   top: 40px;
 }
 #escape {
-  position: absolute;
-  left: 500px;
+  position: relative;
+  display: none;
+  margin-left: 10px;
   top: 40px;
 }
