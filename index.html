@@ -9,7 +9,7 @@
   <body>
 
     <h1>ZAWN</h1>
-    <div class="platno">
+    <div class="canvas">
       <canvas id="canvas" width="800px" height="450px"></canvas>
       <div class="header">zawn</div><br>
       <div class="text">your name:</div><br>
@@ -221,7 +221,7 @@
           Context.context.fillText(this.money, x+95, y-15);
 
           //kresli hracuv inventar (ted uz bez penez)
-          var polozka = 0;
+          var item = 0;
           function compare(a, b) {
             //seradi itemy podle atributu value
             if (a.value > b.value) return -1;
@@ -233,22 +233,22 @@
           Context.context.font = '10pt Bryant';
           for (var i = 0; i < 3; i++) {
             for (var j = 0; j < 7; j++) {
-              if (inv[polozka]) {
+              if (inv[item]) {
 
-                if (polozka != 0 && (inv[polozka].constructor.name === inv[polozka-1].constructor.name)) {
+                if (item != 0 && (inv[item].constructor.name === inv[item-1].constructor.name)) {
                   if (counter == 1) xova -= 38;
                   counter++;
                   Context.context.clearRect(xova, yova, 33, 33);
-                  Context.context.drawImage(inv[polozka].image, xova, yova, 33, 33);
+                  Context.context.drawImage(inv[item].image, xova, yova, 33, 33);
                   Context.context.fillText(counter, xova+2, yova+31);
                   j--;
                 } else {
                   if (counter > 1) xova += 38;
                   var counter = 1;
-                  Context.context.drawImage(inv[polozka].image, xova, yova, 33, 33);
+                  Context.context.drawImage(inv[item].image, xova, yova, 33, 33);
                   xova += 38;
                 }
-                polozka++;
+                item++;
 
               } else {
                 break;
@@ -279,13 +279,13 @@
 
           //vykresleni mistnosti po vstupu do ni
           Context.context.save();
-          this.platno = document.getElementById("canvas")
-          Context.context.clearRect(0, 0, this.platno.width/2+10, this.platno.height)
+          this.canvas = document.getElementById("canvas")
+          Context.context.clearRect(0, 0, this.canvas.width/2+10, this.canvas.height)
           Context.context.restore();
 
-          this.aktualniMistnost = stepInTile(this.locationX, this.locationY, world);
-          this.aktualniMistnost.intro_text(this);
-          this.aktualniMistnost.modify_player(this);
+          this.currentRoom = stepInTile(this.locationX, this.locationY, world);
+          this.currentRoom.intro_text(this);
+          this.currentRoom.modify_player(this);
 
           //kontrola, jestli je hrac zivy a jestli uz nevyhral + co se ma v techto pripadech provest
           if (this.isAlive()) {
@@ -294,7 +294,7 @@
             if (this.victory) {
               Context.context.fillStyle = 'white';
               Context.context.globalAlpha = 0.2;
-              Context.context.fillRect(0, 0, this.platno.width, this.platno.height);
+              Context.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
               Context.context.globalAlpha = 1.0;
               Context.context.fillStyle = 'gold';
               Context.context.font = '35pt Bryant';
@@ -302,7 +302,7 @@
               Context.context.shadowOffsetX = 3;
               Context.context.shadowBlur = 5;
               Context.context.shadowColor = 'black';
-              Context.context.fillText("VICTORY", this.platno.width/2+1, this.platno.height/2+1);
+              Context.context.fillText("VICTORY", this.canvas.width/2+1, this.canvas.height/2+1);
               document.cookie = "seed=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
               document.getElementById("bgmusic").pause();
               $('#playagain').css('display', 'inline-block');
@@ -311,7 +311,7 @@
           } else {
             Context.context.fillStyle = 'white';
             Context.context.globalAlpha = 0.2;
-            Context.context.fillRect(0, 0, this.platno.width, this.platno.height);
+            Context.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
             Context.context.globalAlpha = 1.0;
             Context.context.fillStyle = 'red';
             Context.context.font = '35pt Bryant';
@@ -319,7 +319,7 @@
             Context.context.shadowOffsetX = 3;
             Context.context.shadowBlur = 5;
             Context.context.shadowColor = 'black';
-            Context.context.fillText("YOU DIED", this.platno.width/2+1, this.platno.height/2+1);
+            Context.context.fillText("YOU DIED", this.canvas.width/2+1, this.canvas.height/2+1);
             setCookie("seed", window.seed.toString(), 30);
             document.getElementById("combatmusic").pause();
             $('#playagain').css('display', 'inline-block');
@@ -341,7 +341,7 @@
         }
         attack() {
           //funkce pro utok hrace, po ni nasleduje utok nepritele (ten je specifikovan ve tride roomEnemy)
-          this.enemy = this.aktualniMistnost.enemy;
+          this.enemy = this.currentRoom.enemy;
           //nejprve vybereme nejlepsi zbran v inventari hrace (podle atributu damagemin)
           var best_weapon;
           var max_dmg = 0;
@@ -360,11 +360,11 @@
           //je nepritel stale zivy? + dalsi vypisovani
           if (!this.enemy.isAlive()) {
             this.inCombat = false;
-            this.aktualniMistnost.addLoot(this);
+            this.currentRoom.addLoot(this);
             this.printInventory(480, 315);
             Context.context.clearRect(15, 370, 400, 400);
             wrapText(Context.context, "You killed {0} and looted {1}!".format(this.enemy.name, this.enemy.loot.name), 15, 360, 400, 25);
-            Context.context.clearRect(0, 0, this.platno.width/2+1, this.platno.height/3*2);
+            Context.context.clearRect(0, 0, this.canvas.width/2+1, this.canvas.height/3*2);
             Context.context.drawImage(document.getElementById("enemydead"), 65, 25, 250, 250);
             document.getElementById("combatmusic").pause();
             document.getElementById("combatmusic").currentTime = 0;
@@ -416,13 +416,13 @@
         $('#seedinput').css('display', 'none');
         $('#help').hide();
         $('#helpbutton').click(function() {
-          var pomoc = $('#help');
-          if (pomoc.is(':hidden')) {
+          var help = $('#help');
+          if (help.is(':hidden')) {
             $('#helpbutton').text("hide");
-            pomoc.show('normal');
+            help.show('normal');
           } else {
             $('#helpbutton').text("help");
-            pomoc.hide('normal');
+            help.hide('normal');
           }
         });
         document.getElementById("startmusic").pause();
@@ -444,9 +444,9 @@
           };
           document.getElementById("west").onclick = function(){
             if (player.isAlive() && !player.victory && !player.inCombat) {
-              if (player.inShop && player.aktualniMistnost instanceof roomMerchant) {
-                player.aktualniMistnost.choosingItem(false);
-                player.aktualniMistnost.printInventory(20, 255);
+              if (player.inShop && player.currentRoom instanceof roomMerchant) {
+                player.currentRoom.choosingItem(false);
+                player.currentRoom.printInventory(20, 255);
               } else {
                 player.moveWest(described_world);
               }
@@ -454,9 +454,9 @@
           };
           document.getElementById("east").onclick = function(){
             if (player.isAlive() && !player.victory && !player.inCombat) {
-              if (player.inShop && player.aktualniMistnost instanceof roomMerchant) {
-                player.aktualniMistnost.choosingItem(true);
-                player.aktualniMistnost.printInventory(20, 255);
+              if (player.inShop && player.currentRoom instanceof roomMerchant) {
+                player.currentRoom.choosingItem(true);
+                player.currentRoom.printInventory(20, 255);
               } else {
                 player.moveEast(described_world);
               }
@@ -465,16 +465,16 @@
           document.getElementById("attack").onclick = function(){
             if (player.isAlive() && !player.victory && player.inCombat) {
               player.attack();
-              player.aktualniMistnost.enemy_attack(player);
+              player.currentRoom.enemy_attack(player);
             }
-            else if (player.isAlive() && !player.victory && player.aktualniMistnost instanceof roomLoot) {
-              player.aktualniMistnost.addLoot(player);
+            else if (player.isAlive() && !player.victory && player.currentRoom instanceof roomLoot) {
+              player.currentRoom.addLoot(player);
             }
-            else if (player.isAlive() && !player.victory && player.aktualniMistnost instanceof roomFinal) {
-              player.aktualniMistnost.toNewLevel(player);
+            else if (player.isAlive() && !player.victory && player.currentRoom instanceof roomFinal) {
+              player.currentRoom.toNewLevel(player);
             }
-            else if (player.inShop && player.aktualniMistnost instanceof roomMerchant && player.aktualniMistnost.canTrade) {
-              player.aktualniMistnost.buyItem(player);
+            else if (player.inShop && player.currentRoom instanceof roomMerchant && player.currentRoom.canTrade) {
+              player.currentRoom.buyItem(player);
               player.printInventory(480, 315);
             }
           };
@@ -482,13 +482,13 @@
             if (player.isAlive() && !player.victory && player.inCombat) {
               player.flee(described_world);
             }
-            else if (player.inShop && player.aktualniMistnost instanceof roomMerchant && player.aktualniMistnost.canTrade) {
-              player.aktualniMistnost.sellItem(player);
+            else if (player.inShop && player.currentRoom instanceof roomMerchant && player.currentRoom.canTrade) {
+              player.currentRoom.sellItem(player);
               player.printInventory(480, 315);
             }
           };
           document.getElementById("escape").onclick = function(){
-            if (player.inShop && player.aktualniMistnost instanceof roomMerchant) {
+            if (player.inShop && player.currentRoom instanceof roomMerchant) {
               player.inShop = false;
               $('#escape').css('display', 'none');
               $('#attack').text('attack (d)');
@@ -513,41 +513,41 @@
                 }
                 if (e.keyCode === 37 && !pressEx) {
                   pressEx = true;
-                  if (player.inShop && player.aktualniMistnost instanceof roomMerchant) {
-                    player.aktualniMistnost.choosingItem(false);
-                    player.aktualniMistnost.printInventory(20, 255);
+                  if (player.inShop && player.currentRoom instanceof roomMerchant) {
+                    player.currentRoom.choosingItem(false);
+                    player.currentRoom.printInventory(20, 255);
                   } else {
                     player.moveWest(described_world);
                   }
                 }
                 if (e.keyCode === 39 && !pressEx) {
                   pressEx = true;
-                  if (player.inShop && player.aktualniMistnost instanceof roomMerchant) {
-                    player.aktualniMistnost.choosingItem(true);
-                    player.aktualniMistnost.printInventory(20, 255);
+                  if (player.inShop && player.currentRoom instanceof roomMerchant) {
+                    player.currentRoom.choosingItem(true);
+                    player.currentRoom.printInventory(20, 255);
                   } else {
                     player.moveEast(described_world);
                   }
                 }
                 if (e.keyCode === 68 && !pressEx) {
                   pressEx = true;
-                  if (player.aktualniMistnost instanceof roomLoot) player.aktualniMistnost.addLoot(player);
-                  else if (player.aktualniMistnost instanceof roomFinal) player.aktualniMistnost.toNewLevel(player);
-                  else if (player.inShop && player.aktualniMistnost instanceof roomMerchant && player.aktualniMistnost.canTrade) {
-                    player.aktualniMistnost.buyItem(player);
+                  if (player.currentRoom instanceof roomLoot) player.currentRoom.addLoot(player);
+                  else if (player.currentRoom instanceof roomFinal) player.currentRoom.toNewLevel(player);
+                  else if (player.inShop && player.currentRoom instanceof roomMerchant && player.currentRoom.canTrade) {
+                    player.currentRoom.buyItem(player);
                     player.printInventory(480, 315);
                   }
                 }
                 if (e.keyCode === 70 && !pressEx) {
                   pressEx = true;
-                  if (player.inShop && player.aktualniMistnost instanceof roomMerchant && player.aktualniMistnost.canTrade) {
-                    player.aktualniMistnost.sellItem(player);
+                  if (player.inShop && player.currentRoom instanceof roomMerchant && player.currentRoom.canTrade) {
+                    player.currentRoom.sellItem(player);
                     player.printInventory(480, 315);
                   }
                 }
                 if (e.keyCode === 27 && !pressEx) {
                   pressEx = true;
-                  if (player.inShop && player.aktualniMistnost instanceof roomMerchant) {
+                  if (player.inShop && player.currentRoom instanceof roomMerchant) {
                     player.inShop = false;
                     $('#escape').css('display', 'none');
                     $('#attack').text('attack (d)');
@@ -561,7 +561,7 @@
                 if (e.keyCode === 68 && !pressEx) {
                   pressEx = true;
                   player.attack();
-                  player.aktualniMistnost.enemy_attack(player);
+                  player.currentRoom.enemy_attack(player);
                 }
                 if (e.keyCode === 70 && !pressEx) {
                   pressEx = true;
@@ -586,8 +586,8 @@
           Context.context.fillStyle = 'white';
 
           //vstup do uvodni mistnosti
-          var aktualniMistnost = stepInTile(startingPositionX, startingPositionY, described_world);
-          aktualniMistnost.intro_text(player);
+          var currentRoom = stepInTile(startingPositionX, startingPositionY, described_world);
+          currentRoom.intro_text(player);
 
           //uvodni vykresleni mapy
           drawMap(480, 80, player.locationX, player.locationY, _world);

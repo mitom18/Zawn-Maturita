@@ -61,7 +61,7 @@ function checkWorld(world) {
   return [isNotOK, coordsWrong];
 }
 
-function generateWorld(width, height, uroven) {
+function generateWorld(width, height, generatedLevel) {
   //funkce vygeneruje mapu sveta na zaklade podminek, ale nahodne podle seedu (mapu lze reprodukovat)
   if (!seed) {
     var cookietoseed = getCookie("seed");
@@ -80,78 +80,78 @@ function generateWorld(width, height, uroven) {
 
 
   //napln celou mapku prazdnymi mistnostmi
-  var svet = new Array();
+  var genWorld = new Array();
   for (var i = 0; i < height; i++) {
     var rada = new Array();
     for (var j = 0; j < width; j++) {
       rada.push(2);
     }
-    svet.push(rada);
+    genWorld.push(rada);
   }
 
   //urceni startu a cile a cesty do cile, kde nebudou zdi
   if (Math.random() < 0.5) {
-    svet[0][0] = 0;
+    genWorld[0][0] = 0;
     startingPositionX = 0;
     startingPositionY = 0;
-    svet[height-1][width-1] = 1;
+    genWorld[height-1][width-1] = 1;
 
     var x = 0;
     var y = 0;
     for (var i = 0; i < width-1; i++) {
       if (Math.random() < 0.5) {
         if (x < width-1) x++;
-        if (svet[y][x] === 2) svet[y][x] = 10;
+        if (genWorld[y][x] === 2) genWorld[y][x] = 10;
       } else {
         if (y < height-1) y++;
-        if (svet[y][x] === 2) svet[y][x] = 10;
+        if (genWorld[y][x] === 2) genWorld[y][x] = 10;
         i--;
       }
 
       if (x == width-1 && y != height-1) {
         while (y != height-1) {
           y++;
-          if (svet[y][x] === 2) svet[y][x] = 10;
+          if (genWorld[y][x] === 2) genWorld[y][x] = 10;
           i--;
         }
       }
       else if (x != width-1 && y == height-1) {
         while (x != width-1) {
           x++;
-          if (svet[y][x] === 2) svet[y][x] = 10;
+          if (genWorld[y][x] === 2) genWorld[y][x] = 10;
           i--;
         }
       }
     }
   } else {
-    svet[height-1][0] = 0;
+    genWorld[height-1][0] = 0;
     startingPositionX = 0;
     startingPositionY = height-1;
-    svet[0][width-1] = 1;
+    genWorld[0][width-1] = 1;
 
     var x = 0;
     var y = height - 1;
     for (var i = 0; i < width-1; i++) {
       if (Math.random() < 0.5) {
         if (x < width-1) x++;
-        if (svet[y][x] === 2) svet[y][x] = 10;
+        if (genWorld[y][x] === 2) genWorld[y][x] = 10;
       } else {
         if (y > 0) y--;
-        if (svet[y][x] === 2) svet[y][x] = 10;
+        if (genWorld[y][x] === 2) genWorld[y][x] = 10;
         i--;
       }
 
       if (x == width-1 && y != 0) {
         while (y != 0) {
           y--;
-          if (svet[y][x] === 2) svet[y][x] = 10;
+          if (genWorld[y][x] === 2) genWorld[y][x] = 10;
           i--;
         }
       }
       else if (x != width-1 && y == 0) {
         while (x != width-1) {
           x++;
-          if (svet[y][x] === 2) svet[y][x] = 10;
+          if (genWorld[y][x] === 2) genWorld[y][x] = 10;
           i--;
         }
       }
@@ -159,7 +159,7 @@ function generateWorld(width, height, uroven) {
   }
 
   //urceni zdi
-  var maze = [0, 0, svet[0].length, svet.length];
+  var maze = [0, 0, genWorld[0].length, genWorld.length];
   var stack = [maze];
   var counter1 = 0;
   while (stack.length > 0) {
@@ -169,9 +169,9 @@ function generateWorld(width, height, uroven) {
         var xova = Math.floor(Math.random() * (area[2] - 1 - area[0] + 1)) + area[0];
         for (var i = area[1]; i < area[3]; i++) {
           if (Math.random() < 0.9999) {
-            if (i >= 0 && xova < svet[0].length) if (svet[i][xova] == 2) svet[i][xova] = 6;
+            if (i >= 0 && xova < genWorld[0].length) if (genWorld[i][xova] == 2) genWorld[i][xova] = 6;
           } else {
-            if (i >= 0 && xova < svet[0].length) if (svet[i][xova] == 2) svet[i][xova] = 10;
+            if (i >= 0 && xova < genWorld[0].length) if (genWorld[i][xova] == 2) genWorld[i][xova] = 10;
           }
         }
         var newArea1 = [area[0], area[1], xova-area[0], area[3]];
@@ -182,9 +182,9 @@ function generateWorld(width, height, uroven) {
         var yova = Math.floor(Math.random() * (area[3] - 1 - area[1] + 1)) + area[1];
         for (var i = area[0]; i < area[2]; i++) {
           if (Math.random() < 0.9999) {
-            if (i >= 0 && yova < svet.length) if (svet[yova][i] == 2) svet[yova][i] = 6;
+            if (i >= 0 && yova < genWorld.length) if (genWorld[yova][i] == 2) genWorld[yova][i] = 6;
           } else {
-            if (i >= 0 && yova < svet.length) if (svet[yova][i] == 2) svet[yova][i] = 10;
+            if (i >= 0 && yova < genWorld.length) if (genWorld[yova][i] == 2) genWorld[yova][i] = 10;
           }
         }
         var newArea1 = [area[0], area[1], area[2], yova-area[1]];
@@ -200,30 +200,30 @@ function generateWorld(width, height, uroven) {
   }
 
   //z nedosazitelnych policek se udelaji zdi
-  var repareWorld = checkWorld(svet);
+  var repareWorld = checkWorld(genWorld);
   if (repareWorld[0]) {
     repareWorld[1].forEach(function(item, index) {
       var x = item[0];
       var y = item[1];
-      svet[y][x] = 6;
+      genWorld[y][x] = 6;
     })
   }
 
   //urceni dalsich mistnosti podle urovni
-  if (uroven == 1) {
+  if (generatedLevel == 1) {
     while (true) {
       var randomX = Math.floor(Math.random() * (width - 1 - 0 + 1)) + 0;
       var randomY = Math.floor(Math.random() * (height - 1 - 0 + 1)) + 0;
-      if (svet[randomY][randomX] == 2) {
-        svet[randomY][randomX] = 9;
+      if (genWorld[randomY][randomX] == 2) {
+        genWorld[randomY][randomX] = 9;
         break;
       }
     }
     while (true) {
       var randomX = Math.floor(Math.random() * (width - 1 - 0 + 1)) + 0;
       var randomY = Math.floor(Math.random() * (height - 1 - 0 + 1)) + 0;
-      if (svet[randomY][randomX] == 2) {
-        svet[randomY][randomX] = 12;
+      if (genWorld[randomY][randomX] == 2) {
+        genWorld[randomY][randomX] = 12;
         break;
       }
     }
@@ -231,8 +231,8 @@ function generateWorld(width, height, uroven) {
       while (true) {
         var randomX = Math.floor(Math.random() * (width - 1 - 0 + 1)) + 0;
         var randomY = Math.floor(Math.random() * (height - 1 - 0 + 1)) + 0;
-        if (svet[randomY][randomX] == 2) {
-          svet[randomY][randomX] = 4;
+        if (genWorld[randomY][randomX] == 2) {
+          genWorld[randomY][randomX] = 4;
           break;
         }
       }
@@ -240,20 +240,20 @@ function generateWorld(width, height, uroven) {
     while (true) {
       var randomX = Math.floor(Math.random() * (width - 1 - 0 + 1)) + 0;
       var randomY = Math.floor(Math.random() * (height - 1 - 0 + 1)) + 0;
-      if (svet[randomY][randomX] == 2) {
-        svet[randomY][randomX] = 3;
+      if (genWorld[randomY][randomX] == 2) {
+        genWorld[randomY][randomX] = 3;
         break;
       }
     }
 
   }
-  else if (uroven == 2) {
+  else if (generatedLevel == 2) {
     for (var i = 0; i < 2; i++) {
       while (true) {
         var randomX = Math.floor(Math.random() * (width - 1 - 0 + 1)) + 0;
         var randomY = Math.floor(Math.random() * (height - 1 - 0 + 1)) + 0;
-        if (svet[randomY][randomX] == 2) {
-          svet[randomY][randomX] = 5;
+        if (genWorld[randomY][randomX] == 2) {
+          genWorld[randomY][randomX] = 5;
           break;
         }
       }
@@ -261,8 +261,8 @@ function generateWorld(width, height, uroven) {
     while (true) {
       var randomX = Math.floor(Math.random() * (width - 1 - 0 + 1)) + 0;
       var randomY = Math.floor(Math.random() * (height - 1 - 0 + 1)) + 0;
-      if (svet[randomY][randomX] == 2) {
-        svet[randomY][randomX] = 12;
+      if (genWorld[randomY][randomX] == 2) {
+        genWorld[randomY][randomX] = 12;
         break;
       }
     }
@@ -270,8 +270,8 @@ function generateWorld(width, height, uroven) {
       while (true) {
         var randomX = Math.floor(Math.random() * (width - 1 - 0 + 1)) + 0;
         var randomY = Math.floor(Math.random() * (height - 1 - 0 + 1)) + 0;
-        if (svet[randomY][randomX] == 2) {
-          svet[randomY][randomX] = 4;
+        if (genWorld[randomY][randomX] == 2) {
+          genWorld[randomY][randomX] = 4;
           break;
         }
       }
@@ -279,18 +279,18 @@ function generateWorld(width, height, uroven) {
     while (true) {
       var randomX = Math.floor(Math.random() * (width - 1 - 0 + 1)) + 0;
       var randomY = Math.floor(Math.random() * (height - 1 - 0 + 1)) + 0;
-      if (svet[randomY][randomX] == 2) {
-        svet[randomY][randomX] = 8;
+      if (genWorld[randomY][randomX] == 2) {
+        genWorld[randomY][randomX] = 8;
         break;
       }
     }
   }
-  else if (uroven == 3) {
+  else if (generatedLevel == 3) {
     while (true) {
       var randomX = Math.floor(Math.random() * (width - 1 - 0 + 1)) + 0;
       var randomY = Math.floor(Math.random() * (height - 1 - 0 + 1)) + 0;
-      if (svet[randomY][randomX] == 2) {
-        svet[randomY][randomX] = 7;
+      if (genWorld[randomY][randomX] == 2) {
+        genWorld[randomY][randomX] = 7;
         break;
       }
     }
@@ -298,8 +298,8 @@ function generateWorld(width, height, uroven) {
       while (true) {
         var randomX = Math.floor(Math.random() * (width - 1 - 0 + 1)) + 0;
         var randomY = Math.floor(Math.random() * (height - 1 - 0 + 1)) + 0;
-        if (svet[randomY][randomX] == 2) {
-          svet[randomY][randomX] = 4;
+        if (genWorld[randomY][randomX] == 2) {
+          genWorld[randomY][randomX] = 4;
           break;
         }
       }
@@ -308,19 +308,19 @@ function generateWorld(width, height, uroven) {
       while (true) {
         var randomX = Math.floor(Math.random() * (width - 1 - 0 + 1)) + 0;
         var randomY = Math.floor(Math.random() * (height - 1 - 0 + 1)) + 0;
-        if (svet[randomY][randomX] == 2) {
-          svet[randomY][randomX] = 12;
+        if (genWorld[randomY][randomX] == 2) {
+          genWorld[randomY][randomX] = 12;
           break;
         }
       }
     }
   }
-  else if (uroven == 4) {
+  else if (generatedLevel == 4) {
     while (true) {
       var randomX = Math.floor(Math.random() * (width - 1 - 0 + 1)) + 0;
       var randomY = Math.floor(Math.random() * (height - 1 - 0 + 1)) + 0;
-      if (svet[randomY][randomX] == 2) {
-        svet[randomY][randomX] = 11;
+      if (genWorld[randomY][randomX] == 2) {
+        genWorld[randomY][randomX] = 11;
         break;
       }
     }
@@ -328,8 +328,8 @@ function generateWorld(width, height, uroven) {
       while (true) {
         var randomX = Math.floor(Math.random() * (width - 1 - 0 + 1)) + 0;
         var randomY = Math.floor(Math.random() * (height - 1 - 0 + 1)) + 0;
-        if (svet[randomY][randomX] == 2) {
-          svet[randomY][randomX] = 12;
+        if (genWorld[randomY][randomX] == 2) {
+          genWorld[randomY][randomX] = 12;
           break;
         }
       }
@@ -338,8 +338,8 @@ function generateWorld(width, height, uroven) {
       while (true) {
         var randomX = Math.floor(Math.random() * (width - 1 - 0 + 1)) + 0;
         var randomY = Math.floor(Math.random() * (height - 1 - 0 + 1)) + 0;
-        if (svet[randomY][randomX] == 2) {
-          svet[randomY][randomX] = 8;
+        if (genWorld[randomY][randomX] == 2) {
+          genWorld[randomY][randomX] = 8;
           break;
         }
       }
@@ -348,66 +348,66 @@ function generateWorld(width, height, uroven) {
       while (true) {
         var randomX = Math.floor(Math.random() * (width - 1 - 0 + 1)) + 0;
         var randomY = Math.floor(Math.random() * (height - 1 - 0 + 1)) + 0;
-        if (svet[randomY][randomX] == 2) {
-          svet[randomY][randomX] = 4;
+        if (genWorld[randomY][randomX] == 2) {
+          genWorld[randomY][randomX] = 4;
           break;
         }
       }
     }
   }
 
-  console.log(svet);
-  return svet;
+  console.log(genWorld);
+  return genWorld;
 }
 
-function describeWorld(svet) {
+function describeWorld(world) {
   //funkce doplni do sveta instance trid mistnosti na zaklade cisel v puvodni mapce
-  var svet = svet;
-  var newSvet = new Array();
-  svet.forEach(function(item, index) {
-    var newRada = new Array();
+  var world = world;
+  var newWorld = new Array();
+  world.forEach(function(item, index) {
+    var newRow = new Array();
     item.forEach(function(item2, index2) {
       if (item2 === 0) {
-        var mistnost = new roomStart(index2, index);
+        var room = new roomStart(index2, index);
       }
       else if (item2 === 1) {
-        var mistnost = new roomFinal(index2, index);
+        var room = new roomFinal(index2, index);
       }
       else if (item2 === 2 || item2 === 10) {
-        var mistnost = new emptyPath(index2, index);
+        var room = new emptyPath(index2, index);
       }
       else if (item2 === 3) {
-        var mistnost = new roomLootGold(index2, index);
+        var room = new roomLootGold(index2, index);
       }
       else if (item2 === 4) {
-        var mistnost = new roomLootRandom(index2, index);
+        var room = new roomLootRandom(index2, index);
       }
       else if (item2 === 5) {
-        var mistnost = new roomEnemyOgre(index2, index);
+        var room = new roomEnemyOgre(index2, index);
       }
       else if (item2 === 6) {
-        var mistnost = new Wall(index2, index);
+        var room = new Wall(index2, index);
       }
       else if (item2 === 7) {
-        var mistnost = new roomLootHammer(index2, index);
+        var room = new roomLootHammer(index2, index);
       }
       else if (item2 === 8) {
-        var mistnost = new roomMerchant(index2, index);
+        var room = new roomMerchant(index2, index);
       }
       else if (item2 === 9) {
-        var mistnost = new roomEnemySpider(index2, index);
+        var room = new roomEnemySpider(index2, index);
       }
       else if (item2 === 11) {
-        var mistnost = new roomEnemyMinotaur(index2, index);
+        var room = new roomEnemyMinotaur(index2, index);
       }
       else if (item2 === 12) {
-        var mistnost = new roomEnemyGoblin(index2, index);
+        var room = new roomEnemyGoblin(index2, index);
       }
-      newRada.push(mistnost);
+      newRow.push(room);
     });
-    newSvet.push(newRada);
+    newWorld.push(newRow);
   });
-  return newSvet;
+  return newWorld;
 }
 
 function drawMap(x, y, playerX, playerY, world) {
@@ -529,13 +529,13 @@ class roomFinal {
     return inInventory;
   }
 
-  intro_text(player, intro, postup) {
-    if (intro == undefined || postup == undefined) {
+  intro_text(player, intro, proceed) {
+    if (intro == undefined || proceed == undefined) {
       return null;
     } else {
       if (intro == 1) {
         this.image = document.getElementById("finalgnome");
-        if (postup) {
+        if (proceed) {
           this.text = "What a cute spider! Thank you!";
         } else {
           this.text = "Stop! Bring me a small spider and I will let you get through. If you have it, press D.";
@@ -543,7 +543,7 @@ class roomFinal {
       }
       else if (intro == 2) {
         this.image = document.getElementById("finalguard");
-        if (postup) {
+        if (proceed) {
           this.text = "Nice work, you can go on now.";
         } else {
           this.text = "Stop! I won't let you continue until you give me 2 saphir amulets. If you have them, press D.";
@@ -551,7 +551,7 @@ class roomFinal {
       }
       else if (intro == 3) {
         this.image = document.getElementById("wall");
-        if (postup) {
+        if (proceed) {
           this.text = "One punch and the wall breaks apart. You can continue.";
         } else {
           this.text = "This wall seems weak. With a good tool you should be able to break through. If you have something to use, press D.";
@@ -559,7 +559,7 @@ class roomFinal {
       }
       else if (intro == 4) {
         this.image = document.getElementById("exit");
-        if (postup) {
+        if (proceed) {
           this.text = "The key matches and you unlock the door! You are free, you made it!";
         } else {
           this.text = "The door is locked. You have to find a key to go on. If you have it, press D to proceed.";
@@ -606,7 +606,7 @@ class roomFinal {
         this.intro_text(player, intro, true);
         Context.context.fillStyle = 'white';
         Context.context.globalAlpha = 0.2;
-        Context.context.fillRect(0, 0, player.platno.width, player.platno.height);
+        Context.context.fillRect(0, 0, player.canvas.width, player.canvas.height);
         Context.context.globalAlpha = 1.0;
         Context.context.fillStyle = 'gold';
         Context.context.font = '35pt Bryant';
@@ -614,7 +614,7 @@ class roomFinal {
         Context.context.shadowOffsetX = 3;
         Context.context.shadowBlur = 5;
         Context.context.shadowColor = 'black';
-        Context.context.fillText("VICTORY", player.platno.width/2+1, player.platno.height/2+1);
+        Context.context.fillText("VICTORY", player.canvas.width/2+1, player.canvas.height/2+1);
         document.cookie = "seed=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
         document.getElementById("bgmusic").pause();
         $('#playagain').css('display', 'inline-block');
@@ -650,16 +650,16 @@ class roomFinal {
         player.locationX = startingPositionX;
         player.locationY = startingPositionY;
         window.described_world = describeWorld(_world); //inicializace noveho levelu
-        var novaAktualniMistnost = stepInTile(startingPositionX, startingPositionY, described_world);
+        var newCurrentRoom = stepInTile(startingPositionX, startingPositionY, described_world);
         drawMap(480, 80, player.locationX, player.locationY, _world);
         player.printInventory(480, 315);
-        player.aktualniMistnost = novaAktualniMistnost;
-        Context.context.clearRect(0, 0, player.platno.width/2+10, player.platno.height);
-        novaAktualniMistnost.intro_text(player);
-        novaAktualniMistnost.modify_player(player);
+        player.currentRoom = newCurrentRoom;
+        Context.context.clearRect(0, 0, player.canvas.width/2+10, player.canvas.height);
+        newCurrentRoom.intro_text(player);
+        newCurrentRoom.modify_player(player);
       }
     } else {
-      Context.context.clearRect(0, 0, player.platno.width/2+10, player.platno.height);
+      Context.context.clearRect(0, 0, player.canvas.width/2+10, player.canvas.height);
       this.intro_text(player, intro, false);
       Context.context.clearRect(15, 305, 400, 320);
       wrapText(Context.context, "You don't have all the required items. You must bring them to continue.", 15, 330, 400, 25);
@@ -681,7 +681,7 @@ class roomMerchant extends mapTile {
       this.inventory = [new Dagger(), new Sword()];
     }
     this.invIndex = 0;
-    this.aktualniItem = this.inventory[this.invIndex];
+    this.currentItem = this.inventory[this.invIndex];
   }
   choosingItem(smer) {
     //prochazeni nabidky obchodnika
@@ -692,22 +692,22 @@ class roomMerchant extends mapTile {
       this.invIndex--;
       if (this.invIndex < 0) this.invIndex = this.inventory.length-1;
     }
-    this.aktualniItem = this.inventory[this.invIndex];
+    this.currentItem = this.inventory[this.invIndex];
   }
   buyItem(player) {
     //hrac kupuje item
     var counter = 0;
     for (var item of this.inventory) {
-      if (item.constructor.name === this.aktualniItem.constructor.name) counter++;
+      if (item.constructor.name === this.currentItem.constructor.name) counter++;
     }
     if (counter > 1) {
-      if (player.money >= this.aktualniItem.value) {
-        player.money -= this.aktualniItem.value;
-        player.inventory.push(this.aktualniItem);
+      if (player.money >= this.currentItem.value) {
+        player.money -= this.currentItem.value;
+        player.inventory.push(this.currentItem);
         this.inventory.splice(this.invIndex, 1);
         this.invIndex = 0;
-        this.text = "Enjoy your new {0}, my friend.".format(this.aktualniItem.name);
-        this.aktualniItem = this.inventory[this.invIndex];
+        this.text = "Enjoy your new {0}, my friend.".format(this.currentItem.name);
+        this.currentItem = this.inventory[this.invIndex];
         this.printInventory(20, 255);
       } else {
         this.text = "You have not enough money to buy this item.";
@@ -723,17 +723,17 @@ class roomMerchant extends mapTile {
     this.haveItem = false;
     var i = 0;
     for (var item of player.inventory) {
-      if (item.constructor.name === this.aktualniItem.constructor.name) {
+      if (item.constructor.name === this.currentItem.constructor.name) {
         this.haveItem = true;
         break;
       }
       i++;
     };
     if (this.haveItem) {
-      player.money += this.aktualniItem.value;
+      player.money += this.currentItem.value;
       this.inventory.push(player.inventory[i]);
       player.inventory.splice(i, 1);
-      this.text = "Thank you for this {0}, my friend.".format(this.aktualniItem.name);
+      this.text = "Thank you for this {0}, my friend.".format(this.currentItem.name);
       this.printInventory(20, 255);
     } else {
       this.text = "This item is not in your inventory. You can't sell it.";
@@ -754,7 +754,7 @@ class roomMerchant extends mapTile {
     }
 
     //kresli inventar obchodnika
-    var polozka = 0;
+    var item = 0;
     function compare(a, b) {
       //seradi itemy podle atributu value
       if (a.value > b.value) return -1;
@@ -762,24 +762,25 @@ class roomMerchant extends mapTile {
       return 0;
     };
     var inv = this.inventory.sort(compare);
+    this.currentItem = inv[this.invIndex];
     //vykresli inventar do 1 rady po 10 itemech, stejne itemy se nestackuji
     for (var j = 0; j < 10; j++) {
-      if (inv[polozka]) {
-        if (this.aktualniItem == inv[polozka]) {
-          Context.context.drawImage(inv[polozka].image, xova, yova, 40, 40);
+      if (inv[item]) {
+        if (this.currentItem == inv[item]) {
+          Context.context.drawImage(inv[item].image, xova, yova, 40, 40);
           Context.context.save();
           Context.context.font = '10pt Bryant';
           Context.context.clearRect(xova, yova+27, 30, 15);
           Context.context.drawImage(document.getElementById("coin"), xova, yova+30, 10, 10);
-          Context.context.fillText(this.aktualniItem.value, xova+12, yova+40);
+          Context.context.fillText(this.currentItem.value, xova+12, yova+40);
           Context.context.restore();
           Context.context.clearRect(15, 305, 400, 320);
-          wrapText(Context.context, this.aktualniItem.description, 15, 330, 400, 25);
+          wrapText(Context.context, this.currentItem.description, 15, 330, 400, 25);
         } else {
-          Context.context.drawImage(inv[polozka].image, xova, yova, 33, 33);
+          Context.context.drawImage(inv[item].image, xova, yova, 33, 33);
         }
         xova += 38;
-        polozka++;
+        item++;
       } else {
         break;
       }
@@ -817,7 +818,7 @@ class roomLoot extends mapTile {
     if (!this.taken) {
       player.inventory.push(this.item);
       player.printInventory(480, 315);
-      Context.context.clearRect(0, 0, player.platno.width/2+10, player.platno.height);
+      Context.context.clearRect(0, 0, player.canvas.width/2+10, player.canvas.height);
       Context.context.drawImage(document.getElementById("lootopened"), 65, 25, 250, 250);
       Context.context.drawImage(this.item.image, 170, 175, 30, 30);
       wrapText(Context.context, "You found something! {0}".format(this.item.description), 15, 330, 400, 25);
@@ -840,22 +841,22 @@ class roomLoot extends mapTile {
 class roomLootRandom extends roomLoot {
   constructor(x, y) {
     if (level == 3 || level == 4) {
-      var propDagger = 0.05;
-      var propSword = 0.06;
-      var propPotion = 0.35;
+      var probDagger = 0.05;
+      var probSword = 0.0500000000002;
+      var probPotion = 0.35;
     } else {
-      var propDagger = 0.05;
-      var propSword = 0;
-      var propPotion = 0.35;
+      var probDagger = 0.05;
+      var probSword = 0;
+      var probPotion = 0.4;
     }
 
-    if (Math.random() < propDagger) {
+    if (Math.random() < probDagger) {
       var item = new Dagger();
     }
-    else if (Math.random() < propSword) {
+    else if (Math.random() < probSword) {
       var item = new Sword();
     }
-    else if (Math.random() < propPotion) {
+    else if (Math.random() < probPotion) {
       var item = new LifePotion(5);
     }
     else {
@@ -904,7 +905,7 @@ class roomEnemy extends mapTile {
         wrapText(Context.context, "{0} does {1} damage. You are dead.".format(this.enemy.name, damage), 15, 390, 400, 25);
         Context.context.fillStyle = 'white';
         Context.context.globalAlpha = 0.2;
-        Context.context.fillRect(0, 0, player.platno.width, player.platno.height);
+        Context.context.fillRect(0, 0, player.canvas.width, player.canvas.height);
         Context.context.globalAlpha = 1.0;
         Context.context.fillStyle = 'red';
         Context.context.font = '35pt Bryant';
@@ -912,7 +913,7 @@ class roomEnemy extends mapTile {
         Context.context.shadowOffsetX = 3;
         Context.context.shadowBlur = 5;
         Context.context.shadowColor = 'black';
-        Context.context.fillText("YOU DIED", player.platno.width/2+1, player.platno.height/2+1);
+        Context.context.fillText("YOU DIED", player.canvas.width/2+1, player.canvas.height/2+1);
         setCookie("seed", window.seed.toString(), 30);
         document.getElementById("combatmusic").pause();
         $('#playagain').css('display', 'inline-block');

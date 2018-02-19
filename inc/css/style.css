@@ -50,7 +50,7 @@ h1 {
   }
 }
 
-.platno {
+.canvas {
   position: relative;
   margin-left: auto;
   margin-right: auto;
@@ -62,12 +62,12 @@ h1 {
   border: 2px solid gray;
 }
 @media (max-width: 1024px) {
-  .platno {
+  .canvas {
     margin-top: 35px;
   }
 }
 
-.platno .header {
+.canvas .header {
   position: relative;
   top: -415px;
   text-align: center;
@@ -79,7 +79,7 @@ h1 {
   text-align: center;
 }
 
-.platno .text {
+.canvas .text {
   position: relative;
   top: -400px;
   text-align: center;
@@ -92,7 +92,7 @@ h1 {
   text-align: center;
 }
 
-.platno #play {
+.canvas #play {
   position: relative;
   top: -370px;
   text-align: center;
@@ -100,7 +100,7 @@ h1 {
   z-index: 10;
 }
 
-.platno #playername, .platno #seedinput {
+.canvas #playername, .canvas #seedinput {
   position: relative;
   top: -415px;
   text-align: center;
@@ -114,7 +114,7 @@ h1 {
   border: 2px solid gray;
 }
 
-.platno #playagain {
+.canvas #playagain {
   display: none;
   position: relative;
   top: -190px;
@@ -123,7 +123,7 @@ h1 {
   z-index: 10;
 }
 
-.platno .tlacitko {
+.canvas .tlacitko {
   font-family: Bryant;
   font-size: 15px;
   text-align: center;
@@ -134,20 +134,20 @@ h1 {
   border: 2px solid gray;
 }
 
-.platno .tlacitko:hover {
+.canvas .tlacitko:hover {
   background-color: #fff;
   color: #000;
   cursor: pointer;
 }
 
-.platno #canvas {
+.canvas #canvas {
   position: relative;
   margin: 0;
   width: 800px;
   height: 450px;
 }
 
-.platno .help {
+.canvas .help {
   display: none;
   position: absolute;
   width: 90%;
@@ -165,13 +165,13 @@ h1 {
   border: 1px solid #fff;
 }
 
-.platno .help .heading {
+.canvas .help .heading {
   margin-top: 30px;
   margin-bottom: 15px;
   font-size: 30px;
   text-decoration: underline;
 }
-.platno .help .seed {
+.canvas .help .seed {
   position: absolute;
   right: 15px;
   bottom: 10px;
