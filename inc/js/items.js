@@ -4,9 +4,6 @@ class Item {
     this.description = description;
     this.value = value;
   }
-  itemDescription() {
-    return "{0}{1} Value: {2}".format(this.name, this.description, this.value);
-  }
 }
 
 class Gold extends Item {
@@ -25,28 +22,28 @@ class LifePotion extends Item {
 
 class Key extends Item {
   constructor() {
-    super("Key", "A key with skeleton head.", 100);
+    super("Key", "A key with skeleton head.", 0);
     this.image = document.getElementById("key");
   }
 }
 
 class SmallSpider extends Item {
   constructor() {
-    super("Small spider", "A small spider, child of a deadly creature.", 50);
+    super("Small spider", "A small spider, child of a deadly creature.", 0);
     this.image = document.getElementById("smallspider");
   }
 }
 
 class Saphir extends Item {
   constructor() {
-    super("Saphir amulet", "An amulet made from saphir.", 60);
+    super("Saphir amulet", "An amulet made from saphir.", 0);
     this.image = document.getElementById("saphir");
   }
 }
 
 class Hammer extends Item {
   constructor() {
-    super("Hammer", "A hammer which looks like the Thor's one. Should be enough to break the wall.", 70);
+    super("Hammer", "A hammer which looks like the Thor's one. Should be enough to break the wall.", 0);
     this.image = document.getElementById("hammer");
   }
 }

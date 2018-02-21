@@ -182,7 +182,7 @@ h1 {
   position: relative;
   margin-left: auto;
   margin-right: auto;
-  width: 600px;
+  width: 550px;
   margin-top: 30px;
 }
 @media (max-width: 1440px) {
@@ -240,12 +240,6 @@ h1 {
 #helpbutton {
   position: relative;
   padding: 8px 25px;
-  margin-left: 10px;
-  top: 40px;
-}
-#escape {
-  position: relative;
-  display: none;
   margin-left: 10px;
   top: 40px;
 }

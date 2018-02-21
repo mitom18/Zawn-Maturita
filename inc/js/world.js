@@ -672,35 +672,51 @@ class roomMerchant extends mapTile {
   constructor(x, y) {
     super(x, y);
     if (level == 2) {
-      this.inventory = [new Dagger(), new LifePotion(5), new Dagger(), new LifePotion(5)];
+      this.inventory = [new Dagger(), new LifePotion(5), new LifePotion(5)];
     }
     else if (level == 4) {
-      this.inventory = [new Sword(), new LifePotion(7), new Dagger(), new LifePotion(7), new Sword()];
+      this.inventory = [new Sword(), new LifePotion(7), new Dagger(), new LifePotion(7)];
     }
     else {
       this.inventory = [new Dagger(), new Sword()];
     }
+    this.boolBuy = true;
     this.invIndex = 0;
     this.currentItem = this.inventory[this.invIndex];
   }
-  choosingItem(smer) {
-    //prochazeni nabidky obchodnika
-    if (smer) {
-      this.invIndex++;
-      if (this.invIndex > this.inventory.length-1) this.invIndex = 0;
+  choosingAction() {
+    //prepinani mezi kupovanim a prodavanim
+    this.boolBuy = !this.boolBuy;
+    this.invIndex = 0;
+    if (this.boolBuy) $('#attack').text('buy (d)');
+    else $('#attack').text('sell (d)');
+  }
+  choosingItem(direction, player) {
+    if (this.boolBuy) {
+      //prochazeni nabidky obchodnika, pokud hrac kupuje
+      if (direction) {
+        this.invIndex++;
+        if (this.invIndex > this.inventory.length-1) this.invIndex = 0;
+      } else {
+        this.invIndex--;
+        if (this.invIndex < 0) this.invIndex = this.inventory.length-1;
+      }
+      this.currentItem = this.inventory[this.invIndex];
     } else {
-      this.invIndex--;
-      if (this.invIndex < 0) this.invIndex = this.inventory.length-1;
+      //prochazeni inventare hrace, pokud hrac prodava
+      if (direction) {
+        this.invIndex++;
+        if (this.invIndex > player.inventory.length-1) this.invIndex = 0;
+      } else {
+        this.invIndex--;
+        if (this.invIndex < 0) this.invIndex = player.inventory.length-1;
+      }
+      this.currentItem = player.inventory[this.invIndex];
     }
-    this.currentItem = this.inventory[this.invIndex];
   }
   buyItem(player) {
     //hrac kupuje item
-    var counter = 0;
-    for (var item of this.inventory) {
-      if (item.constructor.name === this.currentItem.constructor.name) counter++;
-    }
-    if (counter > 1) {
+    if (this.inventory.length > 0) {
       if (player.money >= this.currentItem.value) {
         player.money -= this.currentItem.value;
         player.inventory.push(this.currentItem);
@@ -708,52 +724,43 @@ class roomMerchant extends mapTile {
         this.invIndex = 0;
         this.text = "Enjoy your new {0}, my friend.".format(this.currentItem.name);
         this.currentItem = this.inventory[this.invIndex];
-        this.printInventory(20, 255);
+        this.printInventory(20, 255, player);
       } else {
         this.text = "You have not enough money to buy this item.";
       }
-    } else {
-      this.text = "Sorry, my friend. I won't sell you this item, but I'll buy it from you if you have one.";
     }
     Context.context.clearRect(15, 305, 400, 320);
     wrapText(Context.context, this.text, 15, 330, 400, 25);
   }
   sellItem(player) {
     //hrac prodava item
-    this.haveItem = false;
-    var i = 0;
-    for (var item of player.inventory) {
-      if (item.constructor.name === this.currentItem.constructor.name) {
-        this.haveItem = true;
-        break;
-      }
-      i++;
-    };
-    if (this.haveItem) {
+    if (this.currentItem.value > 0) {
+      var i = 0;
+      for (var item of player.inventory) {
+        if (item.constructor.name === this.currentItem.constructor.name) break;
+        i++;
+      };
       player.money += this.currentItem.value;
       this.inventory.push(player.inventory[i]);
       player.inventory.splice(i, 1);
       this.text = "Thank you for this {0}, my friend.".format(this.currentItem.name);
-      this.printInventory(20, 255);
+      this.printInventory(20, 255, player);
     } else {
-      this.text = "This item is not in your inventory. You can't sell it.";
+      this.text = "This is trash! I won't buy it from you.";
     }
     Context.context.clearRect(15, 305, 400, 320);
     wrapText(Context.context, this.text, 15, 330, 400, 25);
   }
-  printInventory(x, y) {
+  printInventory(x, y, player, checkText) {
     //funkce kresli inventar obchodnika
     Context.context.save();
     Context.context.clearRect(x, y, 330, 50);
-    var xova = x;
+    var xova = x+45;
     var yova = y;
 
-    if (this.tradeInicialization) {
-      this.canTrade = true;
-      this.tradeInicialization = false;
-    }
-
     //kresli inventar obchodnika
+    if (this.boolBuy) var description = "BUY";
+    else var description = "SELL";
     var item = 0;
     function compare(a, b) {
       //seradi itemy podle atributu value
@@ -761,10 +768,19 @@ class roomMerchant extends mapTile {
       if (a.value < b.value) return 1;
       return 0;
     };
-    var inv = this.inventory.sort(compare);
+    if (this.boolBuy) {
+      var inv = this.inventory.sort(compare);
+    } else {
+      player.printInventory(480, 315);
+      var inv = player.inventory.sort(compare);
+    }
     this.currentItem = inv[this.invIndex];
     //vykresli inventar do 1 rady po 10 itemech, stejne itemy se nestackuji
-    for (var j = 0; j < 10; j++) {
+    Context.context.save();
+    Context.context.font = '12pt Bryant';
+    Context.context.fillText(description, x, y+25);
+    Context.context.restore();
+    for (var j = 0; j < 8; j++) {
       if (inv[item]) {
         if (this.currentItem == inv[item]) {
           Context.context.drawImage(inv[item].image, xova, yova, 40, 40);
@@ -774,8 +790,10 @@ class roomMerchant extends mapTile {
           Context.context.drawImage(document.getElementById("coin"), xova, yova+30, 10, 10);
           Context.context.fillText(this.currentItem.value, xova+12, yova+40);
           Context.context.restore();
-          Context.context.clearRect(15, 305, 400, 320);
-          wrapText(Context.context, this.currentItem.description, 15, 330, 400, 25);
+          if (checkText === undefined) {
+            Context.context.clearRect(15, 305, 400, 320);
+            wrapText(Context.context, this.currentItem.description, 15, 330, 400, 25);
+          }
         } else {
           Context.context.drawImage(inv[item].image, xova, yova, 33, 33);
         }
@@ -789,18 +807,16 @@ class roomMerchant extends mapTile {
   }
   intro_text(player) {
     this.image = document.getElementById("merchant");
-    this.text = "Greetings, {0}! Are you interested in trading with me? Push Left or Right Arrow to see what I'm offering. You can buy item with D, sell with F and leave with ESC.".format(player.name);
+    this.text = "Greetings, {0}! Push Left or Right to go through items and Up or Down to switch between buying and selling. You can buy or sell item with D and leave with F.".format(player.name);
     Context.context.drawImage(this.image, 65, 25, 250, 250);
     wrapText(Context.context, this.text, 15, 330, 400, 25);
   }
   modify_player(player) {
     player.inCombat = false;
     player.inShop = true;
-    this.canTrade = false;
-    this.tradeInicialization = true;
-    $('#escape').css('display', 'inline');
+    this.printInventory(20, 255, player, true);
     $('#attack').text('buy (d)');
-    $('#flee').text('sell (f)');
+    $('#flee').text('leave (f)');
     document.getElementById("combatmusic").pause();
     document.getElementById("combatmusic").currentTime = 0;
     document.getElementById("bgmusic").play();

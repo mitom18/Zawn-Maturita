@@ -24,9 +24,8 @@
         <p>Left Arrow - move west</p>
         <p>Right Arrow - move east</p>
         <p>Down Arrow - move south</p>
-        <p>D - attack/pick/buy</p>
-        <p>F - flee/sell</p>
-        <p>Escape - enable leaving merchant</p>
+        <p>D - attack/pick/buy/sell</p>
+        <p>F - flee/leave merchant</p>
         <div id="seedshow" class="seed"></div>
       </div>
     </div>
@@ -39,7 +38,6 @@
       <button id="attack" class="tlacitko" type="button" name="button">attack (d)</button>
       <button id="flee" class="tlacitko" type="button" name="button">flee (f)</button>
       <button id="helpbutton" class="tlacitko" type="button" name="button">help</button>
-      <button id="escape" class="tlacitko" type="button" name="button">esc</button>
     </div>
 
     <!-- seznam zvuku ve hre -->
@@ -437,16 +435,29 @@
 
           //inicializace ovladacich tlacitek
           document.getElementById("north").onclick = function(){
-            if (player.isAlive() && !player.victory && !player.inCombat && !player.inShop) player.moveNorth(described_world);
+            if (player.isAlive() && !player.victory && !player.inCombat) {
+              if (player.inShop && player.currentRoom instanceof roomMerchant) {
+                player.currentRoom.choosingAction();
+                player.currentRoom.printInventory(20, 255, player);
+              } else {
+                player.moveNorth(described_world);
+              }
+            }
           };
           document.getElementById("south").onclick = function(){
-            if (player.isAlive() && !player.victory && !player.inCombat && !player.inShop) player.moveSouth(described_world);
+            if (player.isAlive() && !player.victory && !player.inCombat)
+              if (player.inShop && player.currentRoom instanceof roomMerchant) {
+                player.currentRoom.choosingAction();
+                player.currentRoom.printInventory(20, 255, player);
+              } else {
+                player.moveSouth(described_world);
+              }
           };
           document.getElementById("west").onclick = function(){
             if (player.isAlive() && !player.victory && !player.inCombat) {
               if (player.inShop && player.currentRoom instanceof roomMerchant) {
-                player.currentRoom.choosingItem(false);
-                player.currentRoom.printInventory(20, 255);
+                player.currentRoom.choosingItem(false, player);
+                player.currentRoom.printInventory(20, 255, player);
               } else {
                 player.moveWest(described_world);
               }
@@ -455,8 +466,8 @@
           document.getElementById("east").onclick = function(){
             if (player.isAlive() && !player.victory && !player.inCombat) {
               if (player.inShop && player.currentRoom instanceof roomMerchant) {
-                player.currentRoom.choosingItem(true);
-                player.currentRoom.printInventory(20, 255);
+                player.currentRoom.choosingItem(true, player);
+                player.currentRoom.printInventory(20, 255, player);
               } else {
                 player.moveEast(described_world);
               }
@@ -473,8 +484,9 @@
             else if (player.isAlive() && !player.victory && player.currentRoom instanceof roomFinal) {
               player.currentRoom.toNewLevel(player);
             }
-            else if (player.inShop && player.currentRoom instanceof roomMerchant && player.currentRoom.canTrade) {
-              player.currentRoom.buyItem(player);
+            else if (player.inShop && player.currentRoom instanceof roomMerchant) {
+              if (player.currentRoom.boolBuy) player.currentRoom.buyItem(player);
+              else player.currentRoom.sellItem(player);
               player.printInventory(480, 315);
             }
           };
@@ -482,15 +494,8 @@
             if (player.isAlive() && !player.victory && player.inCombat) {
               player.flee(described_world);
             }
-            else if (player.inShop && player.currentRoom instanceof roomMerchant && player.currentRoom.canTrade) {
-              player.currentRoom.sellItem(player);
-              player.printInventory(480, 315);
-            }
-          };
-          document.getElementById("escape").onclick = function(){
-            if (player.inShop && player.currentRoom instanceof roomMerchant) {
+            else if (player.inShop && player.currentRoom instanceof roomMerchant) {
               player.inShop = false;
-              $('#escape').css('display', 'none');
               $('#attack').text('attack (d)');
               $('#flee').text('flee (f)');
               Context.context.clearRect(15, 305, 400, 320);
@@ -505,17 +510,27 @@
               if (!player.inCombat) {
                 if (e.keyCode === 38 && !pressEx) {
                   pressEx = true;
-                  if (!player.inShop) player.moveNorth(described_world);
+                  if (player.inShop && player.currentRoom instanceof roomMerchant) {
+                    player.currentRoom.choosingAction();
+                    player.currentRoom.printInventory(20, 255, player);
+                  } else {
+                    player.moveNorth(described_world);
+                  }
                 }
                 if (e.keyCode === 40 && !pressEx) {
                   pressEx = true;
-                  if (!player.inShop) player.moveSouth(described_world);
+                  if (player.inShop && player.currentRoom instanceof roomMerchant) {
+                    player.currentRoom.choosingAction();
+                    player.currentRoom.printInventory(20, 255, player);
+                  } else {
+                    player.moveSouth(described_world);
+                  }
                 }
                 if (e.keyCode === 37 && !pressEx) {
                   pressEx = true;
                   if (player.inShop && player.currentRoom instanceof roomMerchant) {
-                    player.currentRoom.choosingItem(false);
-                    player.currentRoom.printInventory(20, 255);
+                    player.currentRoom.choosingItem(false, player);
+                    player.currentRoom.printInventory(20, 255, player);
                   } else {
                     player.moveWest(described_world);
                   }
@@ -523,8 +538,8 @@
                 if (e.keyCode === 39 && !pressEx) {
                   pressEx = true;
                   if (player.inShop && player.currentRoom instanceof roomMerchant) {
-                    player.currentRoom.choosingItem(true);
-                    player.currentRoom.printInventory(20, 255);
+                    player.currentRoom.choosingItem(true, player);
+                    player.currentRoom.printInventory(20, 255, player);
                   } else {
                     player.moveEast(described_world);
                   }
@@ -533,23 +548,16 @@
                   pressEx = true;
                   if (player.currentRoom instanceof roomLoot) player.currentRoom.addLoot(player);
                   else if (player.currentRoom instanceof roomFinal) player.currentRoom.toNewLevel(player);
-                  else if (player.inShop && player.currentRoom instanceof roomMerchant && player.currentRoom.canTrade) {
-                    player.currentRoom.buyItem(player);
+                  else if (player.inShop && player.currentRoom instanceof roomMerchant) {
+                    if (player.currentRoom.boolBuy) player.currentRoom.buyItem(player);
+                    else player.currentRoom.sellItem(player);
                     player.printInventory(480, 315);
                   }
                 }
                 if (e.keyCode === 70 && !pressEx) {
                   pressEx = true;
-                  if (player.inShop && player.currentRoom instanceof roomMerchant && player.currentRoom.canTrade) {
-                    player.currentRoom.sellItem(player);
-                    player.printInventory(480, 315);
-                  }
-                }
-                if (e.keyCode === 27 && !pressEx) {
-                  pressEx = true;
                   if (player.inShop && player.currentRoom instanceof roomMerchant) {
                     player.inShop = false;
-                    $('#escape').css('display', 'none');
                     $('#attack').text('attack (d)');
                     $('#flee').text('flee (f)');
                     Context.context.clearRect(15, 305, 400, 320);
@@ -577,7 +585,6 @@
             if (e.keyCode === 39) pressEx = false;
             if (e.keyCode === 68) pressEx = false;
             if (e.keyCode === 70) pressEx = false;
-            if (e.keyCode === 27) pressEx = false;
             if (e.keyCode === 88) document.getElementById("audio").pause();
           }
 
