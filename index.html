@@ -52,18 +52,19 @@
 
     <!-- seznam obrazku ve hre -->
     <div style="display: none;">
-      <img id="img1" src="img/freedom-dove.png" width="512px" height="512px">
-      <img id="torch" src="img/torch.png" width="512px" height="512px">
       <img id="entrance" src="img/dungeon-gate.png" width="512px" height="512px">
       <img id="path" src="img/path.png" width="512px" height="512px">
       <img id="exit" src="img/dungeon-light.png" width="512px" height="512px">
       <img id="cage" src="img/cage.png" width="512px" height="512px">
       <img id="wall" src="img/wall.png" width="512px" height="512px">
-      <img id="gold" src="img/gold.png" width="512px" height="512px">
       <img id="ogre" src="img/ogreroom.png" width="512px" height="512px">
       <img id="spider" src="img/spiderroom.png" width="512px" height="512px">
       <img id="goblin" src="img/goblinroom.png" width="512px" height="512px">
       <img id="minotaur" src="img/minotaurroom.png" width="512px" height="512px">
+      <img id="demon" src="img/demonroom.png" width="512px" height="512px">
+      <img id="diablo" src="img/diabloroom.png" width="512px" height="512px">
+      <img id="orc" src="img/orcroom.png" width="512px" height="512px">
+      <img id="boss" src="img/bossroom.png" width="512px" height="512px">
       <img id="enemydead" src="img/enemydead.png" width="512px" height="512px">
       <img id="lootclosed" src="img/lootclosed.png" width="512px" height="512px">
       <img id="lootopened" src="img/lootopened.png" width="512px" height="512px">
@@ -71,16 +72,23 @@
       <img id="life" src="img/heart.png" width="512px" height="512px">
       <img id="lifepotion" src="img/heart-bottle.png" width="512px" height="512px">
       <img id="key" src="img/skeleton-key.png" width="512px" height="512px">
+      <img id="keyFin" src="img/boss-key.png" width="512px" height="512px">
       <img id="saphir" src="img/saphir.png" width="512px" height="512px">
+      <img id="amulet" src="img/ankh.png" width="512px" height="512px">
       <img id="smallspider" src="img/smallspider.png" width="512px" height="512px">
+      <img id="skull" src="img/skull.png" width="512px" height="512px">
+      <img id="poison" src="img/poison.png" width="512px" height="512px">
       <img id="hammer" src="img/thor-hammer.png" width="512px" height="512px">
       <img id="dagger" src="img/plain-dagger.png" width="512px" height="512px">
       <img id="sword" src="img/broadsword.png" width="512px" height="512px">
       <img id="rock" src="img/rock.png" width="512px" height="512px">
-      <img id="daggerLoot" src="img/dagger.png" width="512px" height="512px">
       <img id="merchant" src="img/merchant.png" width="512px" height="512px">
       <img id="finalgnome" src="img/finalgnome.png" width="512px" height="512px">
       <img id="finalguard" src="img/finalguard.png" width="512px" height="512px">
+      <img id="finalgargoyle" src="img/finalgargoyle.png" width="512px" height="512px">
+      <img id="finalelf" src="img/finalelf.png" width="512px" height="512px">
+      <img id="finalkenku" src="img/finalkenku.png" width="512px" height="512px">
+      <img id="finalfairy" src="img/finalfairy.png" width="512px" height="512px">
     </div>
 
     <script type="text/javascript" src="inc/js/jquery-3.2.1.min.js"></script>
@@ -374,6 +382,9 @@
         }
         flee(world) {
           //funkce pro utek hrace z combatu, utece do nahodne vybrane sousedni mistnosti, ale nepritel mu ubere zivoty
+          var minusHP = Math.floor(Math.random() * (3 - 0 + 1)) + 0;
+          this.hp -= minusHP;
+          this.printInventory(480, 315);
           while (true) {
             var randomIndex = Math.floor(Math.random() * (3 - 0 + 1)) + 0;
             if (randomIndex == 0 && this.locationX-1 > 0 && !(world[this.locationY][this.locationX-1] instanceof Wall)) {
@@ -393,9 +404,6 @@
               break;
             }
           }
-          var minusHP = Math.floor(Math.random() * (3 - 0 + 1)) + 0;
-          this.hp -= minusHP;
-          this.printInventory(480, 315);
         }
       }
 

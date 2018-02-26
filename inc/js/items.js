@@ -23,7 +23,8 @@ class LifePotion extends Item {
 class Key extends Item {
   constructor() {
     super("Key", "A key with skeleton head.", 0);
-    this.image = document.getElementById("key");
+    if (level == levelMax) this.image = document.getElementById("keyFin");
+    else this.image = document.getElementById("key");
   }
 }
 
@@ -41,10 +42,31 @@ class Saphir extends Item {
   }
 }
 
+class Amulet extends Item {
+  constructor() {
+    super("Golden amulet", "An amulet made from gold.", 10);
+    this.image = document.getElementById("amulet");
+  }
+}
+
 class Hammer extends Item {
   constructor() {
     super("Hammer", "A hammer which looks like the Thor's one. Should be enough to break the wall.", 0);
     this.image = document.getElementById("hammer");
+  }
+}
+
+class Poison extends Item {
+  constructor() {
+    super("Poison", "A bottle which contains poison retrieved from dead demon.", 15);
+    this.image = document.getElementById("poison");
+  }
+}
+
+class Skull extends Item {
+  constructor() {
+    super("Skull", "A skull wrested from the corpse of diablo.", 0);
+    this.image = document.getElementById("skull");
   }
 }
 

@@ -13,7 +13,7 @@ class Enemy {
 
 class Ogre extends Enemy {
   constructor() {
-    super("Ogre", 30, 4, 7, new Saphir());
+    super("Ogre", 30, 4, 6, new Saphir());
   }
 }
 
@@ -31,6 +31,30 @@ class Spider extends Enemy {
 
 class Minotaur extends Enemy {
   constructor() {
-    super("Minotaur", 35, 8, 12, new Key());
+    super("Minotaur", 30, 6, 12, new Key());
+  }
+}
+
+class Demon extends Enemy {
+  constructor() {
+    super("Demon", 30, 4, 9, new Poison());
+  }
+}
+
+class Orc extends Enemy {
+  constructor() {
+    super("Orc", 35, 5, 11, new Amulet());
+  }
+}
+
+class Diablo extends Enemy {
+  constructor() {
+    super("Diablo", 40, 7, 12, new Skull());
+  }
+}
+
+class Boss extends Enemy {
+  constructor() {
+    super("Boss", 50, 12, 15, new Key());
   }
 }
