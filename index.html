@@ -16,14 +16,16 @@
       <input id="playername" type="text" name="playername" value="" placeholder="needed"><br>
       <div class="text">seed for world generator:</div><br>
       <input id="seedinput" type="text" name="seedinput" value="" placeholder="optional"><br>
-      <button id="play" class="tlacitko" onclick="gameloop()" type="button" name="button">play</button>
+      <div class="endlessinput"><input id="endlessinput" type="checkbox" name="endlessinput" value="on"><label for="endlessinput">endless game</label></div><br>
+      <button id="play" class="tlacitko" onclick="gameintro()" type="button" name="button">play</button>
       <button id="playagain" class="tlacitko" onclick="reload()" type="button" name="button">play again</button>
+      <button id="play2" class="tlacitko" onclick="togameloop()" type="button" name="button">play</button>
       <div id="help" class="help">
         <p class="heading">keyboard controls</p>
-        <p>Up Arrow - move north</p>
-        <p>Left Arrow - move west</p>
-        <p>Right Arrow - move east</p>
-        <p>Down Arrow - move south</p>
+        <p>Up Arrow - move north/switch buy & sell</p>
+        <p>Left Arrow - move west/go through items</p>
+        <p>Right Arrow - move east/go through items</p>
+        <p>Down Arrow - move south/switch buy & sell</p>
         <p>D - attack/pick/buy/sell</p>
         <p>F - flee/leave merchant</p>
         <div id="seedshow" class="seed"></div>
@@ -45,6 +47,7 @@
     <audio id="startmusic" src="inc/sound/Echinoderm_Regeneration.mp3" autoplay="true" loop="true">
       <source src="inc/sound/Echinoderm_Regeneration.mp3" type="audio/">
     </audio>
+    <audio id="intromusic" src="inc/sound/Forest_of_Fear.mp3" loop="true"></audio>
     <audio id="combatmusic" src="inc/sound/Cataclysmic_Molten_Core.mp3" loop="true"></audio>
     <audio id="bgmusic" src="inc/sound/Echoes_of_Time_v2.mp3" loop="true"></audio>
     <audio id="victorymusic" src="inc/sound/Discovery_Hit.mp3"></audio>
@@ -102,6 +105,8 @@
       //nastaveni hlasitosti hudby
       var startmusic = document.getElementById("startmusic");
       startmusic.volume = 0.15;
+      var startmusic = document.getElementById("intromusic");
+      intromusic.volume = 0.25;
       var combatmusic = document.getElementById("combatmusic");
       combatmusic.volume = 0.15;
       var bgmusic = document.getElementById("bgmusic");
@@ -110,6 +115,12 @@
       victorymusic.volume = 0.35;
       var defeatmusic = document.getElementById("defeatmusic");
       defeatmusic.volume = 0.35;
+
+      //nastaveni zobrazeni checkboxu na nekonecnou hru
+      var enableEndless = getCookie("enableEndless");
+      if (enableEndless == "true") {
+        $('.endlessinput').css('display', 'block');
+      }
 
       //funkce pro inicializi canvas elementu
       var Context = {
@@ -141,6 +152,36 @@
           }
         }
         context.fillText(line, x, y);
+      }
+
+      //funkce pro postupne vypisovani textu
+      var typeOutIsRunning = false;
+      var stopTyping = false;
+      function typeOut(ctx, str, startX, startY, endX, lineHeight) {
+        "use strict";
+        typeOutIsRunning = true;
+        var cursorX = startX || 0;
+        var cursorY = startY || 0;
+        var lineHeight = lineHeight || 32;
+        var i = 0;
+        var $_inter = setInterval(function() {
+          var rem = str.substr(i);
+          var space = rem.indexOf(' ');
+          space = (space === -1)?str.length:space;
+          var wordwidth = ctx.measureText(rem.substring(0, space)).width;
+          var w = ctx.measureText(str.charAt(i)).width;
+          if(cursorX + wordwidth >= endX) {
+              cursorX = startX;
+              cursorY += lineHeight;
+          }
+          ctx.fillText(str.charAt(i), cursorX, cursorY);
+          i++;
+          cursorX += w;
+          if(i === str.length || stopTyping) {
+              clearInterval($_inter);
+          }
+        }, 75);
+        setTimeout(function(){typeOutIsRunning = false}, 12000);
       }
 
       //funkce pro formatovani textu, jednodussi dosazeni promennych do textu
@@ -194,6 +235,7 @@
           this.locationY = startingPositionY;
           this.inCombat = false;
           this.inShop = false;
+          this.wasInShop = false;
           this.victory = false;
         }
         isAlive() {
@@ -310,6 +352,8 @@
               Context.context.shadowColor = 'black';
               Context.context.fillText("VICTORY", this.canvas.width/2+1, this.canvas.height/2+1);
               document.cookie = "seed=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
+              setCookie("watchedIntro", "true", 30);
+              setCookie("enableEndless", "true", 30);
               document.getElementById("bgmusic").pause();
               $('#playagain').css('display', 'inline-block');
               document.getElementById("victorymusic").play();
@@ -407,19 +451,20 @@
         }
       }
 
-      //funkce spusteni jadra hry
-      function gameloop() {
-        "use strict";
+      function gameintro() {
         var playername = document.getElementById("playername").value;
         window.seed = document.getElementById("seedinput").value;
+        if (document.getElementById("endlessinput").checked) window.endless = document.getElementById("endlessinput").value;
+        else window.endless = "false";
         if (!playername) {
-          gameloop();
+          gameintro();
         }
         $('#play').css('display', 'none');
         $('.text').css('display', 'none');
         $('.header').css('display', 'none');
         $('#playername').css('display', 'none');
         $('#seedinput').css('display', 'none');
+        $('.endlessinput').css('display', 'none');
         $('#help').hide();
         $('#helpbutton').click(function() {
           var help = $('#help');
@@ -432,11 +477,42 @@
           }
         });
         document.getElementById("startmusic").pause();
+        document.getElementById("intromusic").play();
+        var watchedIntro = getCookie("watchedIntro");
+        if (watchedIntro != "true") {
+          setCookie("watchedIntro", "true", 30);
+          var gameIntroText = "The Northern Kingdom flourished. Its fields were fertile and its granaries full. But then the king improvidently plunged his land into war. The army was not ready for such a clash. It was a massacre. The land flushed with blood and the kingdom was on the brink of destruction. You are king's courier and His Majesty has sent you to bring help before the decisive battle. However, you were ambushed in the forest and drawn into the ZAWN. You have to escape because you are the last hope of the Northern Kingdom. Will you fulfill your important task?";
+          Context.create("canvas");
+          Context.context.font = '20pt Bryant';
+          Context.context.fillStyle = 'white';
+          typeOut(Context.context, gameIntroText, 15, 70, 785, 30);
+          setTimeout(function(){
+            $('#play2').css('display','block');
+          }, 35000);
+        } else {
+          gameloop();
+        }
+      }
+
+      //funkce pro hladsi prechod mezi intrem a loopem, vymazani textu potrebuje vic casu
+      function togameloop() {
+        stopTyping = true;
+        setTimeout(gameloop, 100);
+      }
+
+      //funkce spusteni jadra hry
+      function gameloop() {
+        "use strict";
+        var playername = document.getElementById("playername").value;
+        $('#play2').css('display','none');
+        document.getElementById("intromusic").pause();
         $(document).ready(function(){
 
           Context.create("canvas"); //inicializace canvas elementu
-
-          window._world = generateWorld(7, 6, level);
+          Context.context.clearRect(0, 0, 1000, 1000); //vycisteni platna
+          console.log(window.endless);
+          if (window.endless != "on") window._world = generateWorld(7, 6, level);
+          else window._world = generateWorld(19, 11, level);
           window.described_world = describeWorld(_world); //inicializace sveta
 
           var player = new Player(playername); //inicialize hrace
@@ -445,8 +521,10 @@
           document.getElementById("north").onclick = function(){
             if (player.isAlive() && !player.victory && !player.inCombat) {
               if (player.inShop && player.currentRoom instanceof roomMerchant) {
-                player.currentRoom.choosingAction();
-                player.currentRoom.printInventory(20, 255, player);
+                if (!typeOutIsRunning) {
+                  player.currentRoom.choosingAction();
+                  player.currentRoom.printInventory(20, 255, player);
+                }
               } else {
                 player.moveNorth(described_world);
               }
@@ -455,8 +533,10 @@
           document.getElementById("south").onclick = function(){
             if (player.isAlive() && !player.victory && !player.inCombat)
               if (player.inShop && player.currentRoom instanceof roomMerchant) {
-                player.currentRoom.choosingAction();
-                player.currentRoom.printInventory(20, 255, player);
+                if (!typeOutIsRunning) {
+                  player.currentRoom.choosingAction();
+                  player.currentRoom.printInventory(20, 255, player);
+                }
               } else {
                 player.moveSouth(described_world);
               }
@@ -464,8 +544,10 @@
           document.getElementById("west").onclick = function(){
             if (player.isAlive() && !player.victory && !player.inCombat) {
               if (player.inShop && player.currentRoom instanceof roomMerchant) {
-                player.currentRoom.choosingItem(false, player);
-                player.currentRoom.printInventory(20, 255, player);
+                if (!typeOutIsRunning) {
+                  player.currentRoom.choosingItem(false, player);
+                  player.currentRoom.printInventory(20, 255, player);
+                }
               } else {
                 player.moveWest(described_world);
               }
@@ -474,8 +556,10 @@
           document.getElementById("east").onclick = function(){
             if (player.isAlive() && !player.victory && !player.inCombat) {
               if (player.inShop && player.currentRoom instanceof roomMerchant) {
-                player.currentRoom.choosingItem(true, player);
-                player.currentRoom.printInventory(20, 255, player);
+                if (!typeOutIsRunning) {
+                  player.currentRoom.choosingItem(true, player);
+                  player.currentRoom.printInventory(20, 255, player);
+                }
               } else {
                 player.moveEast(described_world);
               }
@@ -493,9 +577,11 @@
               player.currentRoom.toNewLevel(player);
             }
             else if (player.inShop && player.currentRoom instanceof roomMerchant) {
-              if (player.currentRoom.boolBuy) player.currentRoom.buyItem(player);
-              else player.currentRoom.sellItem(player);
-              player.printInventory(480, 315);
+              if (!typeOutIsRunning) {
+                if (player.currentRoom.boolBuy) player.currentRoom.buyItem(player);
+                else player.currentRoom.sellItem(player);
+                player.printInventory(480, 315);
+              }
             }
           };
           document.getElementById("flee").onclick = function(){
@@ -503,11 +589,13 @@
               player.flee(described_world);
             }
             else if (player.inShop && player.currentRoom instanceof roomMerchant) {
-              player.inShop = false;
-              $('#attack').text('attack (d)');
-              $('#flee').text('flee (f)');
-              Context.context.clearRect(15, 305, 400, 320);
-              wrapText(Context.context, "Peace be with you, {0}.".format(player.name), 15, 330, 400, 25);
+              if (!typeOutIsRunning) {
+                player.inShop = false;
+                $('#attack').text('attack (d)');
+                $('#flee').text('flee (f)');
+                Context.context.clearRect(15, 305, 400, 320);
+                wrapText(Context.context, "Peace be with you, {0}.".format(player.name), 15, 330, 400, 25);
+              }
             }
           };
 
@@ -519,8 +607,10 @@
                 if (e.keyCode === 38 && !pressEx) {
                   pressEx = true;
                   if (player.inShop && player.currentRoom instanceof roomMerchant) {
-                    player.currentRoom.choosingAction();
-                    player.currentRoom.printInventory(20, 255, player);
+                    if (!typeOutIsRunning) {
+                      player.currentRoom.choosingAction();
+                      player.currentRoom.printInventory(20, 255, player);
+                    }
                   } else {
                     player.moveNorth(described_world);
                   }
@@ -528,8 +618,10 @@
                 if (e.keyCode === 40 && !pressEx) {
                   pressEx = true;
                   if (player.inShop && player.currentRoom instanceof roomMerchant) {
-                    player.currentRoom.choosingAction();
-                    player.currentRoom.printInventory(20, 255, player);
+                    if (!typeOutIsRunning) {
+                      player.currentRoom.choosingAction();
+                      player.currentRoom.printInventory(20, 255, player);
+                    }
                   } else {
                     player.moveSouth(described_world);
                   }
@@ -537,8 +629,10 @@
                 if (e.keyCode === 37 && !pressEx) {
                   pressEx = true;
                   if (player.inShop && player.currentRoom instanceof roomMerchant) {
-                    player.currentRoom.choosingItem(false, player);
-                    player.currentRoom.printInventory(20, 255, player);
+                    if (!typeOutIsRunning) {
+                      player.currentRoom.choosingItem(false, player);
+                      player.currentRoom.printInventory(20, 255, player);
+                    }
                   } else {
                     player.moveWest(described_world);
                   }
@@ -546,8 +640,10 @@
                 if (e.keyCode === 39 && !pressEx) {
                   pressEx = true;
                   if (player.inShop && player.currentRoom instanceof roomMerchant) {
-                    player.currentRoom.choosingItem(true, player);
-                    player.currentRoom.printInventory(20, 255, player);
+                    if (!typeOutIsRunning) {
+                      player.currentRoom.choosingItem(true, player);
+                      player.currentRoom.printInventory(20, 255, player);
+                    }
                   } else {
                     player.moveEast(described_world);
                   }
@@ -557,19 +653,23 @@
                   if (player.currentRoom instanceof roomLoot) player.currentRoom.addLoot(player);
                   else if (player.currentRoom instanceof roomFinal) player.currentRoom.toNewLevel(player);
                   else if (player.inShop && player.currentRoom instanceof roomMerchant) {
-                    if (player.currentRoom.boolBuy) player.currentRoom.buyItem(player);
-                    else player.currentRoom.sellItem(player);
-                    player.printInventory(480, 315);
+                    if (!typeOutIsRunning) {
+                      if (player.currentRoom.boolBuy) player.currentRoom.buyItem(player);
+                      else player.currentRoom.sellItem(player);
+                      player.printInventory(480, 315);
+                    }
                   }
                 }
                 if (e.keyCode === 70 && !pressEx) {
                   pressEx = true;
                   if (player.inShop && player.currentRoom instanceof roomMerchant) {
-                    player.inShop = false;
-                    $('#attack').text('attack (d)');
-                    $('#flee').text('flee (f)');
-                    Context.context.clearRect(15, 305, 400, 320);
-                    wrapText(Context.context, "Peace be with you, {0}.".format(player.name), 15, 330, 400, 25);
+                    if (!typeOutIsRunning) {
+                      player.inShop = false;
+                      $('#attack').text('attack (d)');
+                      $('#flee').text('flee (f)');
+                      Context.context.clearRect(15, 305, 400, 320);
+                      wrapText(Context.context, "Peace be with you, {0}.".format(player.name), 15, 330, 400, 25);
+                    }
                   }
                 }
                 if (e.keyCode === 88) document.getElementById("audio").play();

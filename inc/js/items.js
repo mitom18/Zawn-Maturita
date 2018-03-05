@@ -58,7 +58,7 @@ class Hammer extends Item {
 
 class Poison extends Item {
   constructor() {
-    super("Poison", "A bottle which contains poison retrieved from dead demon.", 15);
+    super("Poison bottle", "A bottle which contains poison retrieved from dead demon.", 15);
     this.image = document.getElementById("poison");
   }
 }

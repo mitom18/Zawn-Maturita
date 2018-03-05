@@ -100,6 +100,30 @@ h1 {
   z-index: 10;
 }
 
+.canvas .endlessinput {
+  position: relative;
+  top: -380px;
+  text-transform: uppercase;
+  z-index: 10;
+  display: none;
+}
+
+.canvas .endlessinput label {
+  margin-left: 5px;
+  font-family: Bryant;
+  color: #fff;
+}
+
+.canvas #play2 {
+  position: absolute;
+  top: 370px;
+  left: 650px;
+  text-align: center;
+  text-transform: uppercase;
+  z-index: 10;
+  display: none;
+}
+
 .canvas #playername, .canvas #seedinput {
   position: relative;
   top: -415px;
@@ -167,7 +191,7 @@ h1 {
 
 .canvas .help .heading {
   margin-top: 30px;
-  margin-bottom: 15px;
+  margin-bottom: 40px;
   font-size: 30px;
   text-decoration: underline;
 }

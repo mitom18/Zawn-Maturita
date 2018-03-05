@@ -61,22 +61,62 @@ function checkWorld(world) {
   return [isNotOK, coordsWrong];
 }
 
-function generateWorld(width, height, generatedLevel) {
-  //funkce vygeneruje mapu sveta na zaklade podminek, ale nahodne podle seedu (mapu lze reprodukovat)
-  if (!seed) {
-    var cookietoseed = getCookie("seed");
-    if (cookietoseed != "") {
-      window.seed = cookietoseed;
-    } else {
-      var d = new Date();
-      window.seed = d.getTime();
+function generateLevelInEndless(generatedLevel, returning) {
+  class newLevel {
+    constructor(generatedLevel, checkedItem, amount, roomsInLevel) {
+      this.level = generatedLevel;
+      this.item = checkedItem;
+      this.itemAmount = amount;
+      this.rooms = roomsInLevel;
     }
   }
+  var difficulty = generatedLevel*100;
+  var enemies = [Spider, Ogre, Minotaur, Demon, Orc, Diablo, Boss];
+  var enemiesRooms = [9, 5, 11, 13, 15, 16, 17];
+  var randomIndex1 = Math.floor(Math.random()*enemies.length);
+  var mainEnemy = enemies[randomIndex1];
+  var mainEnemyRoom = enemiesRooms[randomIndex1];
+  var checkedItem = new mainEnemy().loot.constructor;
+  var amount = Math.floor(difficulty/(new mainEnemy().hp*2));
+  var randomIndex2 = Math.floor(Math.random()*enemies.length);
+  var goblinNumber = Math.floor(Math.random() * 5) + 1;
+  var lootNumber = Math.floor((amount*((new mainEnemy().damagemax+new mainEnemy().damagemin)/2))/2);
+  var roomsInLevel = [[mainEnemyRoom, amount], [12, goblinNumber], [8, 2], [4, lootNumber]];
 
-  console.log(seed);
-  console.log(getCookie("seed"));
-  $('#seedshow').text("world seed: " + seed.toString());
-  Math.seedrandom(seed.toString());
+  console.log(checkedItem);
+  console.log(amount);
+  console.log(roomsInLevel);
+  if (generatedLevel == 1 && window.createdLevel == undefined) {
+    window.createdLevel = new newLevel(generatedLevel, checkedItem, amount, roomsInLevel);
+  } else {
+    if (createdLevel.level != generatedLevel) {
+      createdLevel.level = generatedLevel;
+      createdLevel.itemAmount = amount;
+      createdLevel.rooms = roomsInLevel;
+      createdLevel.item = checkedItem;
+    }
+  }
+  if (returning == "amount") return createdLevel.itemAmount;
+  if (returning == "roomsInLevel") return createdLevel.rooms;
+  if (returning == "checkedItem") return createdLevel.item;
+}
+
+function generateWorld(width, height, generatedLevel) {
+  //funkce vygeneruje mapu sveta na zaklade podminek, ale nahodne podle seedu (mapu lze reprodukovat)
+  if (window.endless != "on" || generatedLevel == 1) {
+    if (!seed) {
+      var cookietoseed = getCookie("seed");
+      if (cookietoseed != "") {
+        window.seed = cookietoseed;
+      } else {
+        var d = new Date();
+        window.seed = d.getTime();
+      }
+    }
+
+    $('#seedshow').text("world seed: " + seed.toString());
+    Math.seedrandom(seed.toString());
+  }
 
 
   //napln celou mapku prazdnymi mistnostmi
@@ -91,15 +131,15 @@ function generateWorld(width, height, generatedLevel) {
 
   //urceni startu a cile a cesty do cile, kde nebudou zdi
   if (Math.random() < 0.5) {
-    genWorld[0][0] = 0;
+    genWorld[0][0] = 0; //start
     startingPositionX = 0;
     startingPositionY = 0;
-    genWorld[height-1][width-1] = 1;
+    genWorld[height-1][width-1] = 1; //cil
 
     var x = 0;
     var y = 0;
     for (var i = 0; i < width-1; i++) {
-      if (Math.random() < 0.5) {
+      if (Math.random() < 0.5) { //s 50% sanci jdi doprava nebo dolu, opakuj dal
         if (x < width-1) x++;
         if (genWorld[y][x] === 2) genWorld[y][x] = 10;
       } else {
@@ -107,14 +147,14 @@ function generateWorld(width, height, generatedLevel) {
         if (genWorld[y][x] === 2) genWorld[y][x] = 10;
         i--;
       }
-
+      //pokud narazis na posledni x, posun se k cili tim sloupcem, tzn. jdi jen dolu
       if (x == width-1 && y != height-1) {
         while (y != height-1) {
           y++;
           if (genWorld[y][x] === 2) genWorld[y][x] = 10;
           i--;
         }
-      }
+      } //pokud narazis na posledni y, posun se k cili tou radou, tzn. jdi jen doprava
       else if (x != width-1 && y == height-1) {
         while (x != width-1) {
           x++;
@@ -124,15 +164,15 @@ function generateWorld(width, height, generatedLevel) {
       }
     }
   } else {
-    genWorld[height-1][0] = 0;
+    genWorld[height-1][0] = 0; //start
     startingPositionX = 0;
     startingPositionY = height-1;
-    genWorld[0][width-1] = 1;
+    genWorld[0][width-1] = 1; //cil
 
     var x = 0;
     var y = height - 1;
     for (var i = 0; i < width-1; i++) {
-      if (Math.random() < 0.5) {
+      if (Math.random() < 0.5) { //s 50% sanci jdi doprava nebo nahoru, opakuj dal
         if (x < width-1) x++;
         if (genWorld[y][x] === 2) genWorld[y][x] = 10;
       } else {
@@ -140,14 +180,14 @@ function generateWorld(width, height, generatedLevel) {
         if (genWorld[y][x] === 2) genWorld[y][x] = 10;
         i--;
       }
-
+      //pokud narazis na posledni x, posun se k cili tim sloupcem, tzn. jdi jen nahoru
       if (x == width-1 && y != 0) {
         while (y != 0) {
           y--;
           if (genWorld[y][x] === 2) genWorld[y][x] = 10;
           i--;
         }
-      }
+      } //pokud narazis na posledni y, posun se k cili tou radou, tzn. jdi jen doprava
       else if (x != width-1 && y == 0) {
         while (x != width-1) {
           x++;
@@ -163,12 +203,12 @@ function generateWorld(width, height, generatedLevel) {
   var stack = [maze];
   var counter1 = 0;
   while (stack.length > 0) {
-    var area = stack.shift();
-    if (area[2] > 1 && area[3] > 1) {
+    var area = stack.pop();
+    if (area[2] > 2 || area[3] > 2) {
       if (area[2] > area[3]) {
-        var xova = Math.floor(Math.random() * (area[2] - 1 - area[0] + 1)) + area[0];
+        var xova = Math.floor(Math.random() * (area[0] + area[2] - 1 - area[0] + 1)) + area[0];
         for (var i = area[1]; i < area[3]; i++) {
-          if (Math.random() < 0.9999) {
+          if (Math.random() < 0.99) {
             if (i >= 0 && xova < genWorld[0].length) if (genWorld[i][xova] == 2) genWorld[i][xova] = 6;
           } else {
             if (i >= 0 && xova < genWorld[0].length) if (genWorld[i][xova] == 2) genWorld[i][xova] = 10;
@@ -176,12 +216,12 @@ function generateWorld(width, height, generatedLevel) {
         }
         var newArea1 = [area[0], area[1], xova-area[0], area[3]];
         var newArea2 = [xova+1, area[1], area[2]-xova+1, area[3]];
-        if (newArea1[2] > 2) stack.push(newArea1);
-        if (newArea2[2] > 2) stack.push(newArea2);
+        if (newArea1[2] > 2 || newArea1[3] > 2) stack.push(newArea1);
+        if (newArea2[2] > 2 || newArea2[3] > 2) stack.push(newArea2);
       } else {
-        var yova = Math.floor(Math.random() * (area[3] - 1 - area[1] + 1)) + area[1];
+        var yova = Math.floor(Math.random() * (area[1] + area[3] - 1 - area[1] + 1)) + area[1];
         for (var i = area[0]; i < area[2]; i++) {
-          if (Math.random() < 0.9999) {
+          if (Math.random() < 0.99) {
             if (i >= 0 && yova < genWorld.length) if (genWorld[yova][i] == 2) genWorld[yova][i] = 6;
           } else {
             if (i >= 0 && yova < genWorld.length) if (genWorld[yova][i] == 2) genWorld[yova][i] = 10;
@@ -189,14 +229,10 @@ function generateWorld(width, height, generatedLevel) {
         }
         var newArea1 = [area[0], area[1], area[2], yova-area[1]];
         var newArea2 = [area[0], yova+1, area[2], area[3]-yova+1];
-        if (newArea1[3] > 2) stack.push(newArea1);
-        if (newArea2[3] > 2) stack.push(newArea2);
+        if (newArea1[3] > 2 || newArea1[2] > 2) stack.push(newArea1);
+        if (newArea2[3] > 2 || newArea2[2] > 2) stack.push(newArea2);
       }
     }
-    if (counter1 > 1000) {
-      break;
-    }
-    counter1++;
   }
 
   //z nedosazitelnych policek se udelaji zdi
@@ -210,44 +246,29 @@ function generateWorld(width, height, generatedLevel) {
   }
 
   //urceni dalsich mistnosti podle urovni
-  if (generatedLevel == 1) {
-    //dvourozmerne pole, [[typ mistnosti, pocet mistnosti toho typu], [dalsi mistnost, jeji pocet]...]
-    var roomsInLevel = [[9, 1], [12, 1], [4, 3], [3, 1]];
+  if (window.endless != "on") {
+    if (generatedLevel == 1) {
+      //dvourozmerne pole, [[typ mistnosti, pocet mistnosti toho typu], [dalsi mistnost, jeji pocet]...]
+      var roomsInLevel = [[9, 1], [12, 1], [4, 3], [3, 1]];
+    }
+    else if (generatedLevel == 2) var roomsInLevel = [[5, 2], [12, 1], [4, 4], [8, 1]];
+    else if (generatedLevel == 3) var roomsInLevel = [[7, 1], [12, 3], [4, 4]];
+    else if (generatedLevel == 4) var roomsInLevel = [[11, 1], [12, 3], [8, 2], [4, 6]];
+    else if (generatedLevel == 5) var roomsInLevel = [[14, 1], [13, 2], [12, 2], [8, 1], [4, 5]];
+    else if (generatedLevel == 6) var roomsInLevel = [[15, 2], [5, 1], [12, 1], [8, 1], [4, 6]];
+    else if (generatedLevel == 7) var roomsInLevel = [[15, 2], [13, 1], [12, 1], [8, 1], [4, 7]];
+    else if (generatedLevel == 8) var roomsInLevel = [[16, 1], [13, 2], [15, 1], [8, 1], [4, 7]];
+    else if (generatedLevel == 9) var roomsInLevel = [[15, 3], [13, 3], [12, 1], [8, 1], [4, 7]];
+    else if (generatedLevel == 10) var roomsInLevel = [[17, 1], [15, 2], [13, 2], [9, 1], [8, 1], [4, 7]];
+  } else {
+    var roomsInLevel = generateLevelInEndless(generatedLevel, "roomsInLevel");
   }
-  else if (generatedLevel == 2) {
-    var roomsInLevel = [[5, 2], [12, 1], [4, 4], [8, 1]];
-  }
-  else if (generatedLevel == 3) {
-    var roomsInLevel = [[7, 1], [12, 3], [4, 4]];
-  }
-  else if (generatedLevel == 4) {
-    var roomsInLevel = [[11, 1], [12, 3], [8, 2], [4, 6]];
-  }
-  else if (generatedLevel == 5) {
-    var roomsInLevel = [[14, 1], [13, 2], [12, 2], [8, 1], [4, 5]];
-  }
-  else if (generatedLevel == 6) {
-    var roomsInLevel = [[15, 2], [5, 1], [12, 1], [8, 1], [4, 6]];
-  }
-  else if (generatedLevel == 7) {
-    var roomsInLevel = [[15, 2], [13, 1], [12, 1], [8, 1], [4, 7]];
-  }
-  else if (generatedLevel == 8) {
-    var roomsInLevel = [[16, 1], [13, 2], [15, 1], [8, 1], [4, 7]];
-  }
-  else if (generatedLevel == 9) {
-    var roomsInLevel = [[15, 3], [13, 3], [12, 1], [8, 1], [4, 7]];
-  }
-  else if (generatedLevel == 10) {
-    var roomsInLevel = [[17, 1], [15, 2], [13, 2], [9, 1], [8, 1], [4, 7]];
-  }
-
   roomsInLevel.forEach(function (item, index) {
     for (var i = 0; i < item[1]; i++) {
-      while (true) {
+      while (true) { //vyber nahodnou mistnost, kde je volno, a dej ji zadany typ
         var randomX = Math.floor(Math.random() * (width - 1 - 0 + 1)) + 0;
         var randomY = Math.floor(Math.random() * (height - 1 - 0 + 1)) + 0;
-        if (genWorld[randomY][randomX] == 2) {
+        if (genWorld[randomY][randomX] == 2 || genWorld[randomY][randomX] == 10) {
           genWorld[randomY][randomX] = item[0];
           break;
         }
@@ -336,30 +357,30 @@ function drawMap(x, y, playerX, playerY, world) {
   var yova = y;
   world.forEach(function(item, index) {
     item.forEach(function(item2, index2) {
-      if (Math.abs(playerX - index2) <= 3 && Math.abs(playerY - index) <= 3) {
+      if (Math.abs(playerX - index2) <= 3 && Math.abs(playerY - index) <= 3) { //zobrazuj jen policka ve 3x3 ctverci kolem hrace
         if (item2 === 0) {
-            Context.context.fillStyle = 'pink';
+            Context.context.fillStyle = 'pink'; //start
         }
         else if (item2 === 1) {
-            Context.context.fillStyle = 'yellow';
+            Context.context.fillStyle = 'yellow'; //cil
         }
         else if (item2 === 2 || item2 === 10 || item2 === 3 || item2 === 4 || item2 === 14) {
-            Context.context.fillStyle = 'grey';
+            Context.context.fillStyle = 'grey'; //obycejne mistnosti/obycejny loot
         }
         else if (item2 === 5 || item2 === 9 || item2 === 11 || item2 == 12 || item2 === 13 || item2 === 15 || item2 === 16 || item2 === 17) {
-            Context.context.fillStyle = 'red';
+            Context.context.fillStyle = 'red'; //nepratele
         }
         else if (item2 === 6) {
-            Context.context.fillStyle = 'black';
+            Context.context.fillStyle = 'black'; //zed
         }
         else if (item2 === 7) {
-            Context.context.fillStyle = 'orange';
+            Context.context.fillStyle = 'orange'; //specialni loot
         }
         else if (item2 === 8) {
-            Context.context.fillStyle = 'green';
+            Context.context.fillStyle = 'green'; //obchodnik
         }
       } else {
-        Context.context.fillStyle = 'black';
+        Context.context.fillStyle = 'black'; //prilis vzdalene policko
       }
       Context.context.fillRect(xova, yova, 15, 15);
       xova += 15;
@@ -367,7 +388,7 @@ function drawMap(x, y, playerX, playerY, world) {
     xova = Xpuv;
     yova += 15;
   });
-  Context.context.fillStyle = 'blue';
+  Context.context.fillStyle = 'blue'; //hracova pozice
   Context.context.fillRect(Xpuv+playerX*15, Ypuv+playerY*15, 15, 15);
   Context.context.restore();
 }
@@ -387,11 +408,11 @@ class mapTile {
     this.image = image;
     this.text = text;
   }
-  intro_text(player) {
+  intro_text(player) { //vypise uvodni text mistnosti a jeji uvodni grafiku
     Context.context.drawImage(this.image, 65, 25, 250, 250);
     wrapText(Context.context, this.text, 15, 330, 400, 25);
   }
-  modify_player(player) {
+  modify_player(player) { //obstara pri vstupu do mistnosti ostatni potrebne funkce
     player.inCombat = false;
     document.getElementById("combatmusic").pause();
     document.getElementById("combatmusic").currentTime = 0;
@@ -469,82 +490,61 @@ class roomFinal {
     } else {
       if (intro == 1) {
         this.image = document.getElementById("finalgnome");
-        if (proceed) {
-          this.text = "What a cute spider! Thank you!";
-        } else {
-          this.text = "Stop! Bring me a small spider and I will let you get through. If you have it, press D.";
-        }
+        if (proceed) this.text = "What a cute spider! Thank you!";
+        else this.text = "Stop! Bring me a small spider and I will let you get through. If you have it, press D.";
       }
       else if (intro == 2) {
         this.image = document.getElementById("finalguard");
-        if (proceed) {
-          this.text = "Nice work, you can go on now.";
-        } else {
-          this.text = "Stop! I won't let you continue until you give me 2 saphir amulets. If you have them, press D.";
-        }
+        if (proceed) this.text = "Nice work, you can go on now.";
+        else this.text = "Stop! I won't let you continue until you give me 2 saphir amulets. If you have them, press D.";
       }
       else if (intro == 3) {
         this.image = document.getElementById("wall");
-        if (proceed) {
-          this.text = "One punch and the wall breaks apart. You can continue.";
-        } else {
-          this.text = "This wall seems weak. With a good tool you should be able to break through. If you have something to use, press D.";
-        }
+        if (proceed) this.text = "One punch and the wall breaks apart. You can continue.";
+        else this.text = "This wall seems weak. With a good tool you should be able to break through. If you have something to use, press D.";
       }
       else if (intro == 4) {
         this.image = document.getElementById("cage");
-        if (proceed) {
-          this.text = "The key matches and you unlock the door! You can go on.";
-        } else {
-          this.text = "The door is locked. You have to find a key to go on. If you have it, press D to proceed.";
-        }
+        if (proceed) this.text = "The key matches and you unlock the door! You can go on.";
+        else this.text = "The door is locked. You have to find a key to go on. If you have it, press D to proceed.";
       }
       else if (intro == 5) {
         this.image = document.getElementById("finalgargoyle");
-        if (proceed) {
-          this.text = "Thank you! Now you can go on.";
-        } else {
-          this.text = "Stop! Bring me 3 bottles of poison and then I'll let you continue. If you have them, press D.";
-        }
+        if (proceed) this.text = "Thank you! Now you can go on.";
+        else this.text = "Stop! Bring me 3 bottles of poison and then I'll let you continue. If you have them, press D.";
       }
       else if (intro == 6) {
         this.image = document.getElementById("finalguard");
-        if (proceed) {
-          this.text = "Thank you! Now you can continue.";
-        } else {
-          this.text = "Stop! Bring me a saphir amulet or a golden amulet and I'll let you get through. If you have it, press D.";
-        }
+        if (proceed) this.text = "Thank you! Now you can continue.";
+        else this.text = "Stop! Bring me a saphir amulet or a golden amulet and I'll let you get through. If you have it, press D.";
       }
       else if (intro == 7) {
         this.image = document.getElementById("finalelf");
-        if (proceed) {
-          this.text = "Nice work, you can go on now.";
-        } else {
-          this.text = "Stop! Bring me 2 golden amulets and then I'll let you continue. If you have them, press D.";
-        }
+        if (proceed) this.text = "Nice work, you can go on now.";
+        else this.text = "Stop! Bring me 2 golden amulets and then I'll let you continue. If you have them, press D.";
       }
       else if (intro == 8) {
         this.image = document.getElementById("finalkenku");
-        if (proceed) {
-          this.text = "Thank you! Nice work, you can continue.";
-        } else {
-          this.text = "Hold on! I won't let you get through until you bring me a skull of diablo. If you have it, press D.";
-        }
+        if (proceed) this.text = "Thank you! Nice work, you can continue.";
+        else this.text = "Hold on! I won't let you get through until you bring me a skull of diablo. If you have it, press D.";
       }
       else if (intro == 9) {
         this.image = document.getElementById("finalfairy");
-        if (proceed) {
-          this.text = "Thank you, my hero! Good luck on your journey.";
-        } else {
-          this.text = "My saviour! I need 3 golden amulets or 3 bottles of poison, will you help me? (You have to..) If you have it, press D.";
-        }
+        if (proceed) this.text = "Thank you, my hero! Good luck on your journey.";
+        else this.text = "My saviour! I need 3 golden amulets or 3 bottles of poison, will you help me? (Well, you have to..) If you have it, press D.";
       }
       else if (intro == 10) {
         this.image = document.getElementById("exit");
-        if (proceed) {
-          this.text = "The key matches and you unlock the door! You are free, you made it!";
-        } else {
-          this.text = "The door is locked. You have to find a key to go on. If you have it, press D to proceed.";
+        if (proceed) this.text = "The key matches and you unlock the door! You are free, you made it!";
+        else this.text = "The door is locked. You have to find a key to go on. If you have it, press D to proceed.";
+      }
+      else if (intro instanceof Array) {
+        this.image = document.getElementById("finalkenku");
+        if (proceed) this.text = "Thank you! Nice work, you can continue.";
+        else {
+          var wantedItem = intro[0];
+          if (intro[1] > 1) this.text = "Stop! Bring me {0} {1}s and I'll let you continue. If you have it, press D to proceed.".format(intro[1], new wantedItem().name);
+          else this.text = "Stop! Bring me {0} and I'll let you continue. If you have it, press D to proceed.".format(new wantedItem().name);
         }
       }
       Context.context.drawImage(this.image, 65, 25, 250, 250);
@@ -557,63 +557,70 @@ class roomFinal {
     document.getElementById("combatmusic").pause();
     document.getElementById("combatmusic").currentTime = 0;
     document.getElementById("bgmusic").play();
-    this.intro_text(player, level, false);
+    if (window.endless != "on") this.intro_text(player, level, false);
+    else this.intro_text(player, [generateLevelInEndless(level, "checkedItem"), generateLevelInEndless(level, "amount")], false);
   }
   toNewLevel(player) {
-    if (level == levelMax) {
-      var checkedItem = Key;
-      var amount = 1;
-      var intro = 10;
-    }
-    else if (level == 1) {
-      var checkedItem = SmallSpider;
-      var amount = 1;
-      var intro = 1;
-    }
-    else if (level == 2) {
-      var checkedItem = Saphir;
-      var amount = 2;
-      var intro = 2;
-    }
-    else if (level == 3) {
-      var checkedItem = Hammer;
-      var amount = 1;
-      var intro = 3;
-    }
-    else if (level == 4) {
-      var checkedItem = Key;
-      var amount = 1;
-      var intro = 4;
-    }
-    else if (level == 5) {
-      var checkedItem = Poison;
-      var amount = 3;
-      var intro = 5;
-    }
-    else if (level == 6) {
-      var checkedItem = new Array(Saphir, Amulet);
-      var amount = 1;
-      var intro = 6;
-    }
-    else if (level == 7) {
-      var checkedItem = Amulet;
-      var amount = 2;
-      var intro = 7;
-    }
-    else if (level == 8) {
-      var checkedItem = Skull;
-      var amount = 1;
-      var intro = 8;
-    }
-    else if (level == 9) {
-      var checkedItem = new Array(Amulet, Poison);
-      var amount = 3;
-      var intro = 9;
+    if (window.endless != "on") {
+      if (level == levelMax) {
+        var checkedItem = Key;
+        var amount = 1;
+        var intro = 10;
+      }
+      else if (level == 1) {
+        var checkedItem = SmallSpider;
+        var amount = 1;
+        var intro = 1;
+      }
+      else if (level == 2) {
+        var checkedItem = Saphir;
+        var amount = 2;
+        var intro = 2;
+      }
+      else if (level == 3) {
+        var checkedItem = Hammer;
+        var amount = 1;
+        var intro = 3;
+      }
+      else if (level == 4) {
+        var checkedItem = Key;
+        var amount = 1;
+        var intro = 4;
+      }
+      else if (level == 5) {
+        var checkedItem = Poison;
+        var amount = 3;
+        var intro = 5;
+      }
+      else if (level == 6) {
+        var checkedItem = new Array(Saphir, Amulet);
+        var amount = 1;
+        var intro = 6;
+      }
+      else if (level == 7) {
+        var checkedItem = Amulet;
+        var amount = 2;
+        var intro = 7;
+      }
+      else if (level == 8) {
+        var checkedItem = Skull;
+        var amount = 1;
+        var intro = 8;
+      }
+      else if (level == 9) {
+        var checkedItem = new Array(Amulet, Poison);
+        var amount = 3;
+        var intro = 9;
+      }
+    } else {
+      var checkedItem = generateLevelInEndless(level, "checkedItem");
+      var amount = generateLevelInEndless(level, "amount");
+      var intro = [checkedItem, amount];
     }
     var checkedItemArray = this.check_item(player, checkedItem, amount);
     if (checkedItemArray[0]) {
       this.intro_text(player, intro, true);
-      if (level == levelMax) {
+      if (level == levelMax && window.endless != "on") {
         player.victory = true;
         Context.context.clearRect(15, 305, 400, 320);
         this.intro_text(player, intro, true);
@@ -629,50 +636,55 @@ class roomFinal {
         Context.context.shadowColor = 'black';
         Context.context.fillText("VICTORY", player.canvas.width/2+1, player.canvas.height/2+1);
         document.cookie = "seed=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
+        setCookie("watchedIntro", "true", 30);
+        setCookie("enableEndless", "true", 30);
         document.getElementById("bgmusic").pause();
         $('#playagain').css('display', 'inline-block');
         document.getElementById("victorymusic").play();
       } else {
         level += 1;
         var deleteQuestItems = checkedItemArray[1];
-
-        if (level == 2) {
-          var newLevelWidth = 10;
-          var newLevelHeight = 6;
-        }
-        else if (level == 3) {
-          var newLevelWidth = 11;
-          var newLevelHeight = 7;
-        }
-        else if (level == 4) {
-          var newLevelWidth = 12;
-          var newLevelHeight = 8;
-        }
-        else if (level == 5) {
-          var newLevelWidth = 15;
-          var newLevelHeight = 10;
-        }
-        else if (level == 6) {
-          var newLevelWidth = 15;
-          var newLevelHeight = 11;
-        }
-        else if (level == 7) {
-          var newLevelWidth = 16;
-          var newLevelHeight = 11;
-        }
-        else if (level == 8) {
-          var newLevelWidth = 17;
-          var newLevelHeight = 11;
-        }
-        else if (level == 9) {
-          var newLevelWidth = 18;
-          var newLevelHeight = 11;
-        }
-        else if (level == 10) {
+        if (window.endless == "on") {
           var newLevelWidth = 19;
           var newLevelHeight = 11;
+        } else {
+          if (level == 2) {
+            var newLevelWidth = 10;
+            var newLevelHeight = 6;
+          }
+          else if (level == 3) {
+            var newLevelWidth = 11;
+            var newLevelHeight = 7;
+          }
+          else if (level == 4) {
+            var newLevelWidth = 12;
+            var newLevelHeight = 8;
+          }
+          else if (level == 5) {
+            var newLevelWidth = 15;
+            var newLevelHeight = 10;
+          }
+          else if (level == 6) {
+            var newLevelWidth = 15;
+            var newLevelHeight = 11;
+          }
+          else if (level == 7) {
+            var newLevelWidth = 16;
+            var newLevelHeight = 11;
+          }
+          else if (level == 8) {
+            var newLevelWidth = 17;
+            var newLevelHeight = 11;
+          }
+          else if (level == 9) {
+            var newLevelWidth = 18;
+            var newLevelHeight = 11;
+          }
+          else if (level == 10) {
+            var newLevelWidth = 19;
+            var newLevelHeight = 11;
+          }
         }
-
         Context.context.clearRect(480, 50, _world[0].length*15, _world.length*15+30); //vycisteni mapy
         _world = generateWorld(newLevelWidth, newLevelHeight, level); //generace noveho levelu
         do {
@@ -711,32 +723,36 @@ class roomMerchant extends mapTile {
   //mistnost s obchodnikem
   constructor(x, y) {
     super(x, y);
-    if (level == 2) {
-      this.inventory = [new Dagger(), new LifePotion(5), new LifePotion(5)];
-    }
-    else if (level == 4) {
-      this.inventory = [new Sword(), new LifePotion(7), new Dagger(), new LifePotion(7)];
-    }
-    else if (level == 5) {
-      this.inventory = [new Poison(), new LifePotion(10), new Sword];
-    }
-    else if (level == 6) {
-      this.inventory = [new LifePotion(5), new LifePotion(10), new Sword];
-    }
-    else if (level == 7) {
-      this.inventory = [new Poison(), new LifePotion(10), new LifePotion(5)];
-    }
-    else if (level == 8) {
-      this.inventory = [new LifePotion(10), new LifePotion(5), new Amulet()];
-    }
-    else if (level == 9) {
-      this.inventory = [new LifePotion(10), new Poison(), new Amulet()];
-    }
-    else if (level == 10) {
-      this.inventory = [new LifePotion(10), new LifePotion(5), new LifePotion(7)];
-    }
-    else {
-      this.inventory = [new Dagger(), new Sword(), new LifePotion(5)];
+    if (window.endless == "on") {
+      this.inventory = [new Dagger(), new Sword(), new LifePotion(10), new LifePotion(5)];
+    } else {
+      if (level == 2) {
+        this.inventory = [new Dagger(), new LifePotion(5), new LifePotion(5)];
+      }
+      else if (level == 4) {
+        this.inventory = [new Sword(), new LifePotion(7), new Dagger(), new LifePotion(7)];
+      }
+      else if (level == 5) {
+        this.inventory = [new Poison(), new LifePotion(10), new Sword];
+      }
+      else if (level == 6) {
+        this.inventory = [new LifePotion(5), new LifePotion(10), new Sword];
+      }
+      else if (level == 7) {
+        this.inventory = [new Poison(), new LifePotion(10), new LifePotion(5)];
+      }
+      else if (level == 8) {
+        this.inventory = [new LifePotion(10), new LifePotion(5), new Amulet()];
+      }
+      else if (level == 9) {
+        this.inventory = [new LifePotion(10), new Poison(), new Amulet()];
+      }
+      else if (level == 10) {
+        this.inventory = [new LifePotion(10), new LifePotion(5), new LifePotion(7)];
+      }
+      else {
+        this.inventory = [new Dagger(), new Sword(), new LifePotion(5)];
+      }
     }
     this.boolBuy = true;
     this.invIndex = 0;
@@ -812,7 +828,7 @@ class roomMerchant extends mapTile {
   printInventory(x, y, player, checkText) {
     //funkce kresli inventar obchodnika
     Context.context.save();
-    Context.context.clearRect(x, y, 330, 50);
+    Context.context.clearRect(x, y, 360, 50);
     var xova = x+45;
     var yova = y;
 
@@ -838,6 +854,7 @@ class roomMerchant extends mapTile {
     Context.context.font = '12pt Bryant';
     Context.context.fillText(description, x, y+25);
     Context.context.restore();
+    if (this.invIndex > 7) item = this.invIndex - 7;
     for (var j = 0; j < 8; j++) {
       if (inv[item]) {
         if (this.currentItem == inv[item]) {
@@ -867,11 +884,15 @@ class roomMerchant extends mapTile {
     this.image = document.getElementById("merchant");
     this.text = "Greetings, {0}! Push Left or Right to go through items and Up or Down to switch between buying and selling. You can buy or sell item with D and leave with F.".format(player.name);
     Context.context.drawImage(this.image, 65, 25, 250, 250);
-    wrapText(Context.context, this.text, 15, 330, 400, 25);
+    stopTyping = false;
+    var watchedIntro = getCookie("watchedIntro");
+    if (player.wasInShop || watchedIntro == "true") wrapText(Context.context, this.text, 15, 330, 400, 25);
+    else typeOut(Context.context, this.text, 15, 330, 415, 25);
   }
   modify_player(player) {
     player.inCombat = false;
     player.inShop = true;
+    player.wasInShop = true;
     this.printInventory(20, 255, player, true);
     $('#attack').text('buy (d)');
     $('#flee').text('leave (f)');
@@ -914,16 +935,21 @@ class roomLoot extends mapTile {
 
 class roomLootRandom extends roomLoot {
   constructor(x, y) {
-    if (level == 3 || level == 4) {
-      var probDagger = 0.05;
-      var probSword = 0.0500000000002;
-      var probPotion = 0.35;
-    } else {
-      var probDagger = 0.05;
-      var probSword = 0;
+    if (window.endless == "on") {
+      var probDagger = 0.15;
+      var probSword = 0.2;
       var probPotion = 0.4;
+    } else {
+      if (level == 3 || level == 4) {
+        var probDagger = 0.05;
+        var probSword = 0.0500000000002;
+        var probPotion = 0.35;
+      } else {
+        var probDagger = 0.05;
+        var probSword = 0;
+        var probPotion = 0.4;
+      }
     }
-
     if (Math.random() < probDagger) {
       var item = new Dagger();
     }
@@ -931,10 +957,10 @@ class roomLootRandom extends roomLoot {
       var item = new Sword();
     }
     else if (Math.random() < probPotion) {
-      var item = new LifePotion(5);
+      var item = new LifePotion(Math.floor(Math.random() * 4) + 5);
     }
     else {
-      var item = new Gold(2);
+      var item = new Gold(Math.floor(Math.random() * 3) + 2);
     }
     super(x, y, item);
   }
@@ -960,9 +986,23 @@ class roomLootPoison extends roomLoot {
 
 class roomEnemy extends mapTile {
   //zakladni trida pro mistnosti s neprately
-  constructor(x, y, enemy) {
+  constructor(x, y, image, text, enemy) {
     super(x, y);
+    this.image1 = image;
+    this.text1 = text;
     this.enemy = enemy;
+  }
+  intro_text(player) {
+    if (this.enemy.isAlive()) {
+      this.image = this.image1;
+      this.text = "{0} You can attack by pressing D or flee by pressing F.".format(this.text1);
+    } else {
+      this.image = document.getElementById("enemydead");
+      if (this.enemy.name == "Boss") this.text = "The corpse of a dead monster lies on the ground. It was perhaps the last obstacle on your way to escape.";
+      else this.text = "The corpse of a dead {0} lies on the ground.".format(this.enemy.name);
+    }
+    Context.context.drawImage(this.image, 65, 25, 250, 250);
+    wrapText(Context.context, this.text, 15, 330, 400, 25);
   }
   modify_player(player) {
     if (this.enemy.isAlive()) {
@@ -975,11 +1015,11 @@ class roomEnemy extends mapTile {
     if (this.enemy.isAlive()) {
       var damage = Math.floor(Math.random() * (this.enemy.damagemax - this.enemy.damagemin + 1)) + this.enemy.damagemin;
       player.hp = player.hp - damage;
-      if (player.isAlive()) {
+      if (player.isAlive()) { //vypsani informace o prubehu boje
         player.printInventory(480, 315);
         Context.context.clearRect(15, 400, 320, 320);
         wrapText(Context.context, "{0} does {1} damage. You have {2} HP remaining.".format(this.enemy.name, damage, player.hp), 15, 390, 400, 25);
-      } else {
+      } else { //spusteni konce hry
         player.printInventory(480, 315);
         Context.context.clearRect(15, 400, 320, 320);
         wrapText(Context.context, "{0} does {1} damage. You are dead.".format(this.enemy.name, damage), 15, 390, 400, 25);
@@ -1008,136 +1048,64 @@ class roomEnemy extends mapTile {
 
 class roomEnemyOgre extends roomEnemy {
   constructor(x, y) {
-    super(x, y, new Ogre());
-  }
-  intro_text(player) {
-    if (this.enemy.isAlive()) {
-      this.image = document.getElementById("ogre");
-      this.text = "An ogre is attacking you with a huge club! You can attack him by pressing D or flee by pressing F.";
-    } else {
-      this.image = document.getElementById("enemydead");
-      this.text = "The corpse of a dead ogre lies on the ground.";
-    }
-    Context.context.drawImage(this.image, 65, 25, 250, 250);
-    wrapText(Context.context, this.text, 15, 330, 400, 25);
+    var image = document.getElementById("ogre");
+    var text = "An ogre is attacking you with a huge club!";
+    super(x, y, image, text, new Ogre());
   }
 }
 
 class roomEnemySpider extends roomEnemy {
   constructor(x, y) {
-    super(x, y, new Spider());
-  }
-  intro_text(player) {
-    if (this.enemy.isAlive()) {
-      this.image = document.getElementById("spider");
-      this.text = "A giant spider is approaching! You can attack it by pressing D or flee by pressing F.";
-    } else {
-      this.image = document.getElementById("enemydead");
-      this.text = "The corpse of a dead spider lies on the ground.";
-    }
-    Context.context.drawImage(this.image, 65, 25, 250, 250);
-    wrapText(Context.context, this.text, 15, 330, 400, 25);
+    var image = document.getElementById("spider");
+    var text = "A giant spider is approaching!";
+    super(x, y, image, text, new Spider());
   }
 }
 
 class roomEnemyGoblin extends roomEnemy {
   constructor(x, y) {
-    super(x, y, new Goblin());
-  }
-  intro_text(player) {
-    if (this.enemy.isAlive()) {
-      this.image = document.getElementById("goblin");
-      this.text = "A currish goblin is trying to rob you! You can attack it by pressing D or flee by pressing F.";
-    } else {
-      this.image = document.getElementById("enemydead");
-      this.text = "The corpse of a dead goblin lies on the ground.";
-    }
-    Context.context.drawImage(this.image, 65, 25, 250, 250);
-    wrapText(Context.context, this.text, 15, 330, 400, 25);
+    var image = document.getElementById("goblin");
+    var text = "A currish goblin is trying to rob you!";
+    super(x, y, image, text, new Goblin());
   }
 }
 
 class roomEnemyMinotaur extends roomEnemy {
   constructor(x, y) {
-    super(x, y, new Minotaur());
-  }
-  intro_text(player) {
-    if (this.enemy.isAlive()) {
-      this.image = document.getElementById("minotaur");
-      this.text = "A frightening minotaur is approaching and everything trembles! You can attack it by pressing D or flee by pressing F.";
-    } else {
-      this.image = document.getElementById("enemydead");
-      this.text = "The corpse of a dead minotaur lies on the ground.";
-    }
-    Context.context.drawImage(this.image, 65, 25, 250, 250);
-    wrapText(Context.context, this.text, 15, 330, 400, 25);
+    var image = document.getElementById("minotaur");
+    var text = "A frightening minotaur is approaching and everything trembles!";
+    super(x, y, image, text, new Minotaur());
   }
 }
 
 class roomEnemyDemon extends roomEnemy {
   constructor(x, y) {
-    super(x, y, new Demon());
-  }
-  intro_text(player) {
-    if (this.enemy.isAlive()) {
-      this.image = document.getElementById("demon");
-      this.text = "A red demon is flying in your direction. You can defend yourself by pressing D or flee by pressing F.";
-    } else {
-      this.image = document.getElementById("enemydead");
-      this.text = "The corpse of a dead demon lies on the ground.";
-    }
-    Context.context.drawImage(this.image, 65, 25, 250, 250);
-    wrapText(Context.context, this.text, 15, 330, 400, 25);
+    var image = document.getElementById("demon");
+    var text = "A red demon is flying in your direction.";
+    super(x, y, image, text, new Demon());
   }
 }
 
 class roomEnemyOrc extends roomEnemy {
   constructor(x, y) {
-    super(x, y, new Orc());
-  }
-  intro_text(player) {
-    if (this.enemy.isAlive()) {
-      this.image = document.getElementById("orc");
-      this.text = "An orc is attacking you with a huge club! You can attack him by pressing D or flee by pressing F.";
-    } else {
-      this.image = document.getElementById("enemydead");
-      this.text = "The corpse of a dead orc lies on the ground.";
-    }
-    Context.context.drawImage(this.image, 65, 25, 250, 250);
-    wrapText(Context.context, this.text, 15, 330, 400, 25);
+    var image = document.getElementById("orc");
+    var text = "An orc is attacking you with a huge club!";
+    super(x, y, image, text, new Orc());
   }
 }
 
 class roomEnemyDiablo extends roomEnemy {
   constructor(x, y) {
-    super(x, y, new Diablo());
-  }
-  intro_text(player) {
-    if (this.enemy.isAlive()) {
-      this.image = document.getElementById("diablo");
-      this.text = "A diablo showed in front of you and is laughing at you! You can attack him by pressing D or flee by pressing F.";
-    } else {
-      this.image = document.getElementById("enemydead");
-      this.text = "The corpse of a dead diablo lies on the ground.";
-    }
-    Context.context.drawImage(this.image, 65, 25, 250, 250);
-    wrapText(Context.context, this.text, 15, 330, 400, 25);
+    var image = document.getElementById("diablo");
+    var text = "A diablo showed in front of you and is laughing at you!";
+    super(x, y, image, text, new Diablo());
   }
 }
 
 class roomEnemyBoss extends roomEnemy {
   constructor(x, y) {
-    super(x, y, new Boss());
-  }
-  intro_text(player) {
-    if (this.enemy.isAlive()) {
-      this.image = document.getElementById("boss");
-      this.text = "Suddenly, you see frightening jaws moving in your direction. The monster is growling! You can attack it by pressing D or flee by pressing F.";
-    } else {
-      this.image = document.getElementById("enemydead");
-      this.text = "The corpse of a dead monster lies on the ground. It was perhaps the last obstacle on your way to escape.";
-    }
-    Context.context.drawImage(this.image, 65, 25, 250, 250);
-    wrapText(Context.context, this.text, 15, 330, 400, 25);
+    var image = document.getElementById("boss");
+    var text = "Suddenly, you see frightening jaws moving in your direction. The monster is growling!";
+    super(x, y, image, text, new Boss());
   }
 }
