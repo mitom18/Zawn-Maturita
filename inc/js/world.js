@@ -201,34 +201,33 @@ function generateWorld(width, height, generatedLevel) {
   //urceni zdi
   var maze = [0, 0, genWorld[0].length, genWorld.length];
   var stack = [maze];
-  var counter1 = 0;
   while (stack.length > 0) {
     var area = stack.pop();
     if (area[2] > 2 || area[3] > 2) {
       if (area[2] > area[3]) {
         var xova = Math.floor(Math.random() * (area[0] + area[2] - 1 - area[0] + 1)) + area[0];
-        for (var i = area[1]; i < area[3]; i++) {
-          if (Math.random() < 0.99) {
+        for (var i = area[1]; i < area[1]+area[3]; i++) {
+          if (Math.random() < 0.75) {
             if (i >= 0 && xova < genWorld[0].length) if (genWorld[i][xova] == 2) genWorld[i][xova] = 6;
           } else {
             if (i >= 0 && xova < genWorld[0].length) if (genWorld[i][xova] == 2) genWorld[i][xova] = 10;
           }
         }
         var newArea1 = [area[0], area[1], xova-area[0], area[3]];
-        var newArea2 = [xova+1, area[1], area[2]-xova+1, area[3]];
+        var newArea2 = [xova+1, area[1], area[2]-(newArea1[2]+1), area[3]];
         if (newArea1[2] > 2 || newArea1[3] > 2) stack.push(newArea1);
         if (newArea2[2] > 2 || newArea2[3] > 2) stack.push(newArea2);
       } else {
         var yova = Math.floor(Math.random() * (area[1] + area[3] - 1 - area[1] + 1)) + area[1];
-        for (var i = area[0]; i < area[2]; i++) {
-          if (Math.random() < 0.99) {
+        for (var i = area[0]; i < area[0]+area[2]; i++) {
+          if (Math.random() < 0.75) {
             if (i >= 0 && yova < genWorld.length) if (genWorld[yova][i] == 2) genWorld[yova][i] = 6;
           } else {
             if (i >= 0 && yova < genWorld.length) if (genWorld[yova][i] == 2) genWorld[yova][i] = 10;
           }
         }
         var newArea1 = [area[0], area[1], area[2], yova-area[1]];
-        var newArea2 = [area[0], yova+1, area[2], area[3]-yova+1];
+        var newArea2 = [area[0], yova+1, area[2], area[3]-(newArea1[3]+1)];
         if (newArea1[3] > 2 || newArea1[2] > 2) stack.push(newArea1);
         if (newArea2[3] > 2 || newArea2[2] > 2) stack.push(newArea2);
       }
@@ -637,6 +636,7 @@ class roomFinal {
         Context.context.fillText("VICTORY", player.canvas.width/2+1, player.canvas.height/2+1);
         document.cookie = "seed=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
         setCookie("watchedIntro", "true", 30);
+        setCookie("wasInShop", "true", 30);
         setCookie("enableEndless", "true", 30);
         document.getElementById("bgmusic").pause();
         $('#playagain').css('display', 'inline-block');
@@ -885,14 +885,14 @@ class roomMerchant extends mapTile {
     this.text = "Greetings, {0}! Push Left or Right to go through items and Up or Down to switch between buying and selling. You can buy or sell item with D and leave with F.".format(player.name);
     Context.context.drawImage(this.image, 65, 25, 250, 250);
     stopTyping = false;
-    var watchedIntro = getCookie("watchedIntro");
-    if (player.wasInShop || watchedIntro == "true") wrapText(Context.context, this.text, 15, 330, 400, 25);
+    var wasInShop = getCookie("wasInShop");
+    if (wasInShop == "true" || !player.isAlive()) wrapText(Context.context, this.text, 15, 330, 400, 25);
     else typeOut(Context.context, this.text, 15, 330, 415, 25);
   }
   modify_player(player) {
     player.inCombat = false;
     player.inShop = true;
-    player.wasInShop = true;
+    setCookie("wasInShop", "true", 30);
     this.printInventory(20, 255, player, true);
     $('#attack').text('buy (d)');
     $('#flee').text('leave (f)');

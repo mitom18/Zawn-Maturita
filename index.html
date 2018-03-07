@@ -235,7 +235,6 @@
           this.locationY = startingPositionY;
           this.inCombat = false;
           this.inShop = false;
-          this.wasInShop = false;
           this.victory = false;
         }
         isAlive() {
@@ -353,6 +352,7 @@
               Context.context.fillText("VICTORY", this.canvas.width/2+1, this.canvas.height/2+1);
               document.cookie = "seed=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
               setCookie("watchedIntro", "true", 30);
+              setCookie("wasInShop", "true", 30);
               setCookie("enableEndless", "true", 30);
               document.getElementById("bgmusic").pause();
               $('#playagain').css('display', 'inline-block');
@@ -510,7 +510,6 @@
 
           Context.create("canvas"); //inicializace canvas elementu
           Context.context.clearRect(0, 0, 1000, 1000); //vycisteni platna
-          console.log(window.endless);
           if (window.endless != "on") window._world = generateWorld(7, 6, level);
           else window._world = generateWorld(19, 11, level);
           window.described_world = describeWorld(_world); //inicializace sveta
