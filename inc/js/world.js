@@ -61,7 +61,7 @@ function checkWorld(world) {
   return [isNotOK, coordsWrong];
 }
 
-function generateLevelInEndless(generatedLevel, returning) {
+function generateLevelInEndless(player, generatedLevel, returning) {
   class newLevel {
     constructor(generatedLevel, checkedItem, amount, roomsInLevel) {
       this.level = generatedLevel;
@@ -70,22 +70,52 @@ function generateLevelInEndless(generatedLevel, returning) {
       this.rooms = roomsInLevel;
     }
   }
-  var difficulty = generatedLevel*100;
-  var enemies = [Spider, Ogre, Minotaur, Demon, Orc, Diablo, Boss];
-  var enemiesRooms = [9, 5, 11, 13, 15, 16, 17];
-  var randomIndex1 = Math.floor(Math.random()*enemies.length);
-  var mainEnemy = enemies[randomIndex1];
-  var mainEnemyRoom = enemiesRooms[randomIndex1];
+  if (player != undefined) {
+    var best_weapon;
+    var max_dmg = 0;
+    player.inventory.forEach(function(item, index) {
+      if (item instanceof Weapon) {
+        if (((item.damagemin+item.damagemax)/2) > max_dmg) {
+          max_dmg = (item.damagemin+item.damagemax)/2;
+          best_weapon = item;
+        }
+      }
+    });
+    var difficulty = generatedLevel*player.hp*((best_weapon.damagemin+best_weapon.damagemax)/2);
+  } else {
+    var difficulty = generatedLevel*50*3.5;
+  }
+  var enemies1 = [Spider, Ogre];
+  var enemiesRooms1 = [9, 5];
+  var enemies2 = [Ogre, Minotaur, Demon];
+  var enemiesRooms2 = [5, 11, 13];
+  var enemies3 = [Demon, Orc, Diablo, Boss];
+  var enemiesRooms3 = [13, 15, 16, 17];
+
+  if (generatedLevel < 2) {
+    var randomIndex1 = Math.floor(Math.random()*(enemies1.length));
+    var mainEnemy = enemies1[randomIndex1];
+    var mainEnemyRoom = enemiesRooms1[randomIndex1];
+  }
+  else if (generatedLevel < 4) {
+    var randomIndex1 = Math.floor(Math.random()*enemies2.length);
+    var mainEnemy = enemies2[randomIndex1];
+    var mainEnemyRoom = enemiesRooms2[randomIndex1];
+  }
+  else {
+    var randomIndex1 = Math.floor(Math.random()*enemies3.length);
+    var mainEnemy = enemies3[randomIndex1];
+    var mainEnemyRoom = enemiesRooms3[randomIndex1];
+  }
+
   var checkedItem = new mainEnemy().loot.constructor;
-  var amount = Math.floor(difficulty/(new mainEnemy().hp*2));
-  var randomIndex2 = Math.floor(Math.random()*enemies.length);
+  var amount = Math.floor(difficulty/(new mainEnemy().hp*((new mainEnemy().damagemax+new mainEnemy().damagemin)/2)));
+  if (amount == 0) amount = 1;
+  else if (amount > 10) amount = 10;
   var goblinNumber = Math.floor(Math.random() * 5) + 1;
-  var lootNumber = Math.floor((amount*((new mainEnemy().damagemax+new mainEnemy().damagemin)/2))/2);
+  var lootNumber = Math.floor(Math.random() * (amount*2+10 - amount*2+3 + 1)) + amount*2;
   var roomsInLevel = [[mainEnemyRoom, amount], [12, goblinNumber], [8, 2], [4, lootNumber]];
 
-  console.log(checkedItem);
-  console.log(amount);
-  console.log(roomsInLevel);
   if (generatedLevel == 1 && window.createdLevel == undefined) {
     window.createdLevel = new newLevel(generatedLevel, checkedItem, amount, roomsInLevel);
   } else {
@@ -199,33 +229,36 @@ function generateWorld(width, height, generatedLevel) {
   }
 
   //urceni zdi
+  //oblast je vzdy reprezentovana polem [startX, startY, sirka, vyska]
   var maze = [0, 0, genWorld[0].length, genWorld.length];
-  var stack = [maze];
-  while (stack.length > 0) {
-    var area = stack.pop();
-    if (area[2] > 2 || area[3] > 2) {
-      if (area[2] > area[3]) {
+  var stack = [maze]; //do seznamu ukolu pridej celou oblast
+  while (stack.length > 0) { //opakuj, dokud neni seznam prazdny
+    var area = stack.shift(); //vezmi ze seznamu "nejstarsi" pridanou oblast
+    if (area[2] > 2 || area[3] > 2) { // pokud je vyska nebo sirka oblasti vetsi nez 2, tak ji rozdel
+      if (area[2] > area[3]) { //pokud je sirka vetsi nez vyska, pak del horizontalne
         var xova = Math.floor(Math.random() * (area[0] + area[2] - 1 - area[0] + 1)) + area[0];
         for (var i = area[1]; i < area[1]+area[3]; i++) {
-          if (Math.random() < 0.75) {
+          if (Math.random() < 0.75) { //vytvor zed se 75% prpsti
             if (i >= 0 && xova < genWorld[0].length) if (genWorld[i][xova] == 2) genWorld[i][xova] = 6;
           } else {
             if (i >= 0 && xova < genWorld[0].length) if (genWorld[i][xova] == 2) genWorld[i][xova] = 10;
           }
         }
+        //vytvor nove oblasti a pridej je do seznamu, pokud josu dostatecne velke
         var newArea1 = [area[0], area[1], xova-area[0], area[3]];
         var newArea2 = [xova+1, area[1], area[2]-(newArea1[2]+1), area[3]];
         if (newArea1[2] > 2 || newArea1[3] > 2) stack.push(newArea1);
         if (newArea2[2] > 2 || newArea2[3] > 2) stack.push(newArea2);
-      } else {
+      } else { //pokud je vyska oblasti vetsi nez vyska, pak del vertikalne
         var yova = Math.floor(Math.random() * (area[1] + area[3] - 1 - area[1] + 1)) + area[1];
         for (var i = area[0]; i < area[0]+area[2]; i++) {
-          if (Math.random() < 0.75) {
+          if (Math.random() < 0.75) { //vytvor zed se 75% prpsti
             if (i >= 0 && yova < genWorld.length) if (genWorld[yova][i] == 2) genWorld[yova][i] = 6;
           } else {
             if (i >= 0 && yova < genWorld.length) if (genWorld[yova][i] == 2) genWorld[yova][i] = 10;
           }
         }
+        //vytvor nove oblasti a pridej je do seznamu, pokud josu dostatecne velke
         var newArea1 = [area[0], area[1], area[2], yova-area[1]];
         var newArea2 = [area[0], yova+1, area[2], area[3]-(newArea1[3]+1)];
         if (newArea1[3] > 2 || newArea1[2] > 2) stack.push(newArea1);
@@ -260,7 +293,8 @@ function generateWorld(width, height, generatedLevel) {
     else if (generatedLevel == 9) var roomsInLevel = [[15, 3], [13, 3], [12, 1], [8, 1], [4, 7]];
     else if (generatedLevel == 10) var roomsInLevel = [[17, 1], [15, 2], [13, 2], [9, 1], [8, 1], [4, 7]];
   } else {
-    var roomsInLevel = generateLevelInEndless(generatedLevel, "roomsInLevel");
+    var player;
+    var roomsInLevel = generateLevelInEndless(player, generatedLevel, "roomsInLevel");
   }
   roomsInLevel.forEach(function (item, index) {
     for (var i = 0; i < item[1]; i++) {
@@ -413,6 +447,7 @@ class mapTile {
   }
   modify_player(player) { //obstara pri vstupu do mistnosti ostatni potrebne funkce
     player.inCombat = false;
+    $('#attack').text('attack (d)');
     document.getElementById("combatmusic").pause();
     document.getElementById("combatmusic").currentTime = 0;
     document.getElementById("bgmusic").play();
@@ -432,6 +467,9 @@ class roomStart extends mapTile {
 }
 
 class Wall extends mapTile {
+  constructor(x, y) {
+    super(x, y);
+  }
   intro_text(player) {
     return null;
   }
@@ -448,7 +486,10 @@ class emptyPath extends mapTile {
   }
 }
 
-class roomFinal {
+class roomFinal extends mapTile {
+  constructor(x, y) {
+    super(x, y);
+  }
   check_item(player, checkedItem, amount) {
     var inInventory = false;
     var counter = 0;
@@ -482,7 +523,6 @@ class roomFinal {
     }
     return [inInventory, checkedItem1];
   }
-
   intro_text(player, intro, proceed) {
     if (intro == undefined || proceed == undefined) {
       return null;
@@ -550,14 +590,14 @@ class roomFinal {
       wrapText(Context.context, this.text, 15, 330, 400, 25);
     }
   }
-
   modify_player(player) {
     player.inCombat = false;
+    $('#attack').text('proceed (d)');
     document.getElementById("combatmusic").pause();
     document.getElementById("combatmusic").currentTime = 0;
     document.getElementById("bgmusic").play();
     if (window.endless != "on") this.intro_text(player, level, false);
-    else this.intro_text(player, [generateLevelInEndless(level, "checkedItem"), generateLevelInEndless(level, "amount")], false);
+    else this.intro_text(player, [generateLevelInEndless(player, level, "checkedItem"), generateLevelInEndless(player, level, "amount")], false);
   }
   toNewLevel(player) {
     if (window.endless != "on") {
@@ -612,8 +652,8 @@ class roomFinal {
         var intro = 9;
       }
     } else {
-      var checkedItem = generateLevelInEndless(level, "checkedItem");
-      var amount = generateLevelInEndless(level, "amount");
+      var checkedItem = generateLevelInEndless(player, level, "checkedItem");
+      var amount = generateLevelInEndless(player, level, "amount");
       var intro = [checkedItem, amount];
     }
     var checkedItemArray = this.check_item(player, checkedItem, amount);
@@ -931,14 +971,21 @@ class roomLoot extends mapTile {
     Context.context.drawImage(this.image, 65, 25, 250, 250);
     wrapText(Context.context, this.text, 15, 330, 400, 25);
   }
+  modify_player(player) {
+    player.inCombat = false;
+    $('#attack').text('pick (d)');
+    document.getElementById("combatmusic").pause();
+    document.getElementById("combatmusic").currentTime = 0;
+    document.getElementById("bgmusic").play();
+  }
 }
 
 class roomLootRandom extends roomLoot {
   constructor(x, y) {
     if (window.endless == "on") {
-      var probDagger = 0.15;
-      var probSword = 0.2;
-      var probPotion = 0.4;
+      var probDagger = 0.07;
+      var probSword = 0.09;
+      var probPotion = 0.55;
     } else {
       if (level == 3 || level == 4) {
         var probDagger = 0.05;
@@ -985,7 +1032,7 @@ class roomLootPoison extends roomLoot {
 }
 
 class roomEnemy extends mapTile {
-  //zakladni trida pro mistnosti s neprately
+  //zakladni trida pro mistnosti s neprateli
   constructor(x, y, image, text, enemy) {
     super(x, y);
     this.image1 = image;
@@ -1005,6 +1052,7 @@ class roomEnemy extends mapTile {
     wrapText(Context.context, this.text, 15, 330, 400, 25);
   }
   modify_player(player) {
+    $('#attack').text('attack (d)');
     if (this.enemy.isAlive()) {
       player.inCombat = true;
       document.getElementById("bgmusic").pause();
@@ -1034,7 +1082,7 @@ class roomEnemy extends mapTile {
         Context.context.shadowBlur = 5;
         Context.context.shadowColor = 'black';
         Context.context.fillText("YOU DIED", player.canvas.width/2+1, player.canvas.height/2+1);
-        setCookie("seed", window.seed.toString(), 30);
+        if (window.endless == "false") setCookie("seed", window.seed.toString(), 30);
         document.getElementById("combatmusic").pause();
         $('#playagain').css('display', 'inline-block');
         document.getElementById("defeatmusic").play();

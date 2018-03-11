@@ -100,7 +100,6 @@
     <script type="text/javascript" src="inc/js/enemies.js"></script>
     <script type="text/javascript" src="inc/js/world.js"></script>
     <script type="text/javascript">
-      "use strict";
 
       //nastaveni hlasitosti hudby
       var startmusic = document.getElementById("startmusic");
@@ -158,7 +157,6 @@
       var typeOutIsRunning = false;
       var stopTyping = false;
       function typeOut(ctx, str, startX, startY, endX, lineHeight) {
-        "use strict";
         typeOutIsRunning = true;
         var cursorX = startX || 0;
         var cursorY = startY || 0;
@@ -370,7 +368,7 @@
             Context.context.shadowBlur = 5;
             Context.context.shadowColor = 'black';
             Context.context.fillText("YOU DIED", this.canvas.width/2+1, this.canvas.height/2+1);
-            setCookie("seed", window.seed.toString(), 30);
+            if (window.endless == "false") setCookie("seed", window.seed.toString(), 30);
             document.getElementById("combatmusic").pause();
             $('#playagain').css('display', 'inline-block');
             document.getElementById("defeatmusic").play();
@@ -392,13 +390,13 @@
         attack() {
           //funkce pro utok hrace, po ni nasleduje utok nepritele (ten je specifikovan ve tride roomEnemy)
           this.enemy = this.currentRoom.enemy;
-          //nejprve vybereme nejlepsi zbran v inventari hrace (podle atributu damagemin)
+          //nejprve vybereme nejlepsi zbran v inventari hrace (podle prumerne sily utoku)
           var best_weapon;
           var max_dmg = 0;
           this.inventory.forEach(function(item, index) {
             if (item instanceof Weapon) {
-              if (((item.damagemin+item.damagemin)/2) > max_dmg) {
-                max_dmg = (item.damagemin+item.damagemin)/2;
+              if (((item.damagemin+item.damagemax)/2) > max_dmg) {
+                max_dmg = (item.damagemin+item.damagemax)/2;
                 best_weapon = item;
               }
             }
@@ -481,7 +479,7 @@
         var watchedIntro = getCookie("watchedIntro");
         if (watchedIntro != "true") {
           setCookie("watchedIntro", "true", 30);
-          var gameIntroText = "The Northern Kingdom flourished. Its fields were fertile and its granaries full. But then the king improvidently plunged his land into war. The army was not ready for such a clash. It was a massacre. The land flushed with blood and the kingdom was on the brink of destruction. You are king's courier and His Majesty has sent you to bring help before the decisive battle. However, you were ambushed in the forest and drawn into the ZAWN. You have to escape because you are the last hope of the Northern Kingdom. Will you fulfill your important task?";
+          var gameIntroText = "The Northern Kingdom flourished. Its fields were fertile and its granaries full. But then the king improvidently plunged his land into war. The army was not ready for such a clash. It was a massacre. The land flushed with blood and the kingdom was on the brink of destruction. You are king's courier and His Majesty has sent you to bring help before the decisive battle. However, you were ambushed in the forest and drawn into the ZAWN. You have to escape because you are the last hope of the Northern Kingdom. Will you fulfill your crucial task?";
           Context.create("canvas");
           Context.context.font = '20pt Bryant';
           Context.context.fillStyle = 'white';
@@ -502,7 +500,6 @@
 
       //funkce spusteni jadra hry
       function gameloop() {
-        "use strict";
         var playername = document.getElementById("playername").value;
         $('#play2').css('display','none');
         document.getElementById("intromusic").pause();
