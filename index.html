@@ -123,7 +123,7 @@
       };
 
       //nastaveni stylu webu pro mobilni prohlizec
-      if (mobilecheck == true) $('body').css('overflow', 'visible');
+      if (mobilecheck()) $('body').css('overflow', 'visible');
 
       //nastaveni zobrazeni checkboxu na nekonecnou hru
       var enableEndless = getCookie("enableEndless");
