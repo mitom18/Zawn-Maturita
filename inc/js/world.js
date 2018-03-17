@@ -229,6 +229,9 @@ function generateWorld(width, height, generatedLevel) {
   }
 
   //urceni zdi
+  //prpst tvoreni zdi
+  if (window.endless == "on") var probWall = 0.6;
+  else var probWall = 0.75;
   //oblast je vzdy reprezentovana polem [startX, startY, sirka, vyska]
   var maze = [0, 0, genWorld[0].length, genWorld.length];
   var stack = [maze]; //do seznamu ukolu pridej celou oblast
@@ -238,7 +241,7 @@ function generateWorld(width, height, generatedLevel) {
       if (area[2] > area[3]) { //pokud je sirka vetsi nez vyska, pak del horizontalne
         var xova = Math.floor(Math.random() * (area[0] + area[2] - 1 - area[0] + 1)) + area[0];
         for (var i = area[1]; i < area[1]+area[3]; i++) {
-          if (Math.random() < 0.75) { //vytvor zed se 75% prpsti
+          if (Math.random() < probWall) { //vytvor zed s prpsti urcenou pred cyklem (row 233)
             if (i >= 0 && xova < genWorld[0].length) if (genWorld[i][xova] == 2) genWorld[i][xova] = 6;
           } else {
             if (i >= 0 && xova < genWorld[0].length) if (genWorld[i][xova] == 2) genWorld[i][xova] = 10;
@@ -252,7 +255,7 @@ function generateWorld(width, height, generatedLevel) {
       } else { //pokud je vyska oblasti vetsi nez vyska, pak del vertikalne
         var yova = Math.floor(Math.random() * (area[1] + area[3] - 1 - area[1] + 1)) + area[1];
         for (var i = area[0]; i < area[0]+area[2]; i++) {
-          if (Math.random() < 0.75) { //vytvor zed se 75% prpsti
+          if (Math.random() < probWall) { //vytvor zed s prpsti urcenou pred cyklem (row 233)
             if (i >= 0 && yova < genWorld.length) if (genWorld[yova][i] == 2) genWorld[yova][i] = 6;
           } else {
             if (i >= 0 && yova < genWorld.length) if (genWorld[yova][i] == 2) genWorld[yova][i] = 10;

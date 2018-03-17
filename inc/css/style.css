@@ -20,7 +20,7 @@ body {
 
 @media (max-width: 425px) {
   body {
-    overflow: scroll;
+    overflow: visible;
   }
 }
 
