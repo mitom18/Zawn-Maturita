@@ -287,14 +287,14 @@ function generateWorld(width, height, generatedLevel) {
       var roomsInLevel = [[9, 1], [12, 1], [4, 3], [3, 1]];
     }
     else if (generatedLevel == 2) var roomsInLevel = [[5, 2], [12, 1], [4, 4], [8, 1]];
-    else if (generatedLevel == 3) var roomsInLevel = [[7, 1], [12, 3], [4, 4]];
+    else if (generatedLevel == 3) var roomsInLevel = [[7, 1], [12, 3], [4, 5]];
     else if (generatedLevel == 4) var roomsInLevel = [[11, 1], [12, 3], [8, 2], [4, 6]];
-    else if (generatedLevel == 5) var roomsInLevel = [[14, 1], [13, 2], [12, 2], [8, 1], [4, 5]];
-    else if (generatedLevel == 6) var roomsInLevel = [[15, 2], [5, 1], [12, 1], [8, 1], [4, 6]];
-    else if (generatedLevel == 7) var roomsInLevel = [[15, 2], [13, 1], [12, 1], [8, 1], [4, 7]];
-    else if (generatedLevel == 8) var roomsInLevel = [[16, 1], [13, 2], [15, 1], [8, 1], [4, 7]];
-    else if (generatedLevel == 9) var roomsInLevel = [[15, 3], [13, 3], [12, 1], [8, 1], [4, 7]];
-    else if (generatedLevel == 10) var roomsInLevel = [[17, 1], [15, 2], [13, 2], [9, 1], [8, 1], [4, 7]];
+    else if (generatedLevel == 5) var roomsInLevel = [[14, 1], [13, 2], [12, 2], [8, 1], [4, 6]];
+    else if (generatedLevel == 6) var roomsInLevel = [[15, 2], [5, 1], [12, 1], [8, 1], [4, 7]];
+    else if (generatedLevel == 7) var roomsInLevel = [[15, 2], [13, 1], [12, 1], [8, 1], [4, 8]];
+    else if (generatedLevel == 8) var roomsInLevel = [[16, 1], [13, 2], [15, 1], [8, 1], [4, 9]];
+    else if (generatedLevel == 9) var roomsInLevel = [[15, 2], [13, 2], [12, 2], [8, 1], [4, 10]];
+    else if (generatedLevel == 10) var roomsInLevel = [[17, 1], [15, 1], [13, 2], [12, 2], [8, 1], [4, 10]];
   } else {
     var player;
     var roomsInLevel = generateLevelInEndless(player, generatedLevel, "roomsInLevel");

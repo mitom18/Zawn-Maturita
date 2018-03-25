@@ -286,6 +286,8 @@
           var inv = this.inventory.sort(compare);
           //vykresli inventar do 3 rad po 7 itemech, stejne itemy se stackuji
           Context.context.font = '10pt Bryant';
+          Context.context.strokeStyle = 'black';
+          Context.context.lineWidth = 0.15;
           for (var i = 0; i < 3; i++) {
             for (var j = 0; j < 7; j++) {
               if (inv[item]) {
@@ -296,6 +298,7 @@
                   Context.context.clearRect(xova, yova, 33, 33);
                   Context.context.drawImage(inv[item].image, xova, yova, 33, 33);
                   Context.context.fillText(counter, xova+2, yova+31);
+                  Context.context.strokeText(counter, xova+2, yova+31);
                   j--;
                 } else {
                   if (counter > 1) xova += 38;
@@ -379,6 +382,7 @@
             Context.context.shadowColor = 'black';
             Context.context.fillText("YOU DIED", this.canvas.width/2+1, this.canvas.height/2+1);
             if (window.endless == "false") setCookie("seed", window.seed.toString(), 30);
+            document.getElementById("bgmusic").pause();
             document.getElementById("combatmusic").pause();
             $('#playagain').css('display', 'inline-block');
             document.getElementById("defeatmusic").play();

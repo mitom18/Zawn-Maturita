@@ -55,6 +55,6 @@ class Diablo extends Enemy {
 
 class Boss extends Enemy {
   constructor() {
-    super("Boss", 50, 12, 15, new Key());
+    super("Boss", 50, 10, 14, new Key());
   }
 }
