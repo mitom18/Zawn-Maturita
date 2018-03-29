@@ -1,22 +1,10 @@
 # Zawn-Maturita
-ivt maturitni prace
+Maturitní práce z IVT
 
-dokumentace-osnova
+Pro hraní jsou doporučeny prohlížeče Google Chrome, popřípadě Microsoft Edge. Aby program fungoval správně, nesmí mít hráč v prohlížeči zakázán JavaScript a cookies.
 
-uživatel
+Ne všechny prohlížeče podporují funkci cookies při spuštění z lokálního souborového systému, tudíž není vhodné hrát hru spuštěním souboru index.html. Hru si je možné kdykoliv zahrát na webové adrese http://beta.arcig.cz/lide/tomanm/Zawn-Maturita/.
 
-úvodní slovo, vysvětlení, o co jde, příběh na pozadí hry
-návod k úvodnímu menu, laicky vysvětlit, k čemu je seed, následuje intro, po dalším kliku hra
-vysvětlení herní obrazovky, základní ovládání, ukázka jednotlivých místností a případně jejich zvláštní ovládání (obchodník),
-systém soubojů - vše screenshoty
-říct, že hra má 10 úrovní a po dohrání příběhu se odemkne nekonečná hra, tuto možnost lze vybrat při příštím vstupu do hlavního menu
+Všechny obrázky ve hře jsou vytvořeny pomocí generátoru http://game-icons.net/ a použity pod licencí Creative Commons (CC BY 3.0).
 
-programátor
-
-úvod, ve kterém se uvedou technické parametry, co všechno používám, jazyky, knihovny, HTML5 canvas
-jako první popsat svět, jak se generuje (asi nejzajímavější část, takže hodně natáhnout a popsat detailněji - 
-seedování, algoritmus rekurzivního půlení u tvorby bludiště, algoritmus na nové levely u nekonečné hry, pokud bude zajímavější),
-jak funguje, co ho reprezentuje, funkce kolem něj, ukázat využití dědičnosti ve třídách místností a jejich funkčnost,
-přes třídy místností se dostaneme ke třídám nepřátel a předmětů, kde se také využívá dědičnost
-nakonec popsat hráče a jeho třídu, která v podstatě obstarává funkci hlavního cyklu hry
-na závěr možná ukázat nějaké pomocné funkce, jako například postupné vypisování textu, funkce format, cookies atd.
+Hudba ve hře je převzata ze zvukové knihovny serveru YouTube. Takové skladby lze u všech projektů používat bezplatně.
