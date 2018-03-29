@@ -1,4 +1,4 @@
-# Zawn-Maturita
+# Zawn
 Maturitní práce z IVT
 
 Pro hraní jsou doporučeny prohlížeče Google Chrome, popřípadě Microsoft Edge. Aby program fungoval správně, nesmí mít hráč v prohlížeči zakázán JavaScript a cookies.
