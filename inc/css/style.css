@@ -241,12 +241,12 @@ h1 {
 }
 #south {
   position: absolute;
-  left: 45px;
+  left: 43px;
   top: 80px;
 }
 #north {
   position: absolute;
-  left: 45px;
+  left: 43px;
   top: 0;
 }
 #attack {
